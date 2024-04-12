@@ -66,5 +66,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1712734735752';
+    @import 'airspaces.less?1712945804852';
 </style>
