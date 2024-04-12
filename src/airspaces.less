@@ -1,0 +1,149 @@
+.plugin__content {
+    //padding: 10px !important;
+
+    [data-ref="aipDiv"] {
+        position        : absolute;
+        top             : 60px !important;
+        //bottom: 120px;
+        width           : 90%;
+        background-color: transparent !important;
+        border-style    : solid !important;
+        border-width    : 0.75px 0px !important;
+        border-color    : rgba(128, 128, 128, 0.5) !important;
+        border-radius   : 0px !important;
+        color           : inherit !important;
+        overflow-y      : scroll;
+
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(128, 128, 128, .5);
+        }
+
+        &::-webkit-scrollbar-track {
+            background: 0 0;
+        }
+
+        .section-head {
+            position   : relative;
+            font-size  : 16px;
+            line-height: 1.4em;
+        }
+
+        .section-checkbox {
+            font-size         : 16px;
+            -webkit-appearance: none;
+            appearance        : none;
+            background-color  : transparent;
+            width             : 30px;
+            color             : inherit !important;
+            cursor            : pointer;
+
+        }
+
+        .section-checkbox:focus {
+            outline: 0;
+        }
+
+        .section-checkbox::before {
+            content: '\25BD\00a0\00a0';
+        }
+
+        .section-checkbox:checked::before {
+            padding-top: 3px;
+            content    : '\25B7\00a0\00a0';
+        }
+
+        .space-div {
+            height: 2px;
+        }
+
+        .section-checkbox:checked+label+.space-div {
+            height: 10px;
+        }
+
+        .section-checkbox:checked+label+.space-div+div {
+            display: none;
+        }
+
+        .section-content {
+            margin-bottom: 4px;
+        }
+
+        .icao-list {
+            padding-bottom: 10px;
+        }
+    }
+
+    .aipHead {
+        position   : absolute;
+        font-size  : 20px !important;
+        font-weight: bold;
+        //height     : 25px;
+        margin     : 1px 0px 0px 1px;
+    }
+
+    .aipInfo {
+        position        : absolute;
+        overflow-y      : scroll;
+        padding         : 5px;
+        font-size       : 11px;
+        color           : black;
+        bottom          : 27px;
+        //top: calc(100% - 120px) !important;
+        //height:  90px;
+        width           : 100%;
+        overflow-y      : scroll;
+        background-color: transparent !important;
+        border-style    : solid !important;
+        border-width    : 1px 0px !important;
+        border-color    : rgba(128, 128, 128, 0.5) !important;
+        border-radius   : 0px !important;
+        color           : inherit !important;
+
+    }
+
+    .aipFoot {
+        position   : absolute;
+        font-size  : 9px;
+        bottom     : 0px;
+        height     : 27px;
+        margin-left: 1px;
+    }
+
+    .drag-handle {
+        box-sizing : border-box;
+        height     : 30px;
+        width      : 90px;
+        position   : absolute;
+        margin-left: -45px;
+        margin-top : -15px;
+        left       : calc(50%);
+        cursor     : pointer;
+
+        //top: calc(100% - 120px);
+        //border: 2px solid blue;
+        &::before {
+            content         : ' ';
+            box-sizing      : border-box;
+            position        : absolute;
+            left            : 30px;
+            top             : 10px;
+            width           : 30px;
+            height          : 10px;
+            border          : 1px solid rgba(150, 150, 150, 1);
+            border-radius   : 4px;
+            background-color: rgba(230, 230, 230, 0.5);
+        }
+    }
+}
+
+
+.closing-x {
+    display  : block;
+    right    : 0px;
+    top      : 0.25em;
+    font-size: 30px;
+}

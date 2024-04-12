@@ -1,13 +1,13 @@
 import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
-    name: 'windy-plugin-da',
+    name: 'windy-plugin-airspaces',
     version: '0.1.0',
-    icon: '🔌',
-    title: 'Density Altitude',
-    description:'Denstiy Altitude Plugin',
+    icon: '✈',
+    title: 'Airspaces',
+    description:'Shows airspaces from openaip.net',
     author: 'Rittels',
-    repository: 'https://github.com/windycom/windy-plugin-template',
+    repository: 'github.com/rittels-windy-plugins/windy-plugin-airspaces.git',
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
     //routerPath: '/my-plugin',
