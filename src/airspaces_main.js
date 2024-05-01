@@ -3,16 +3,14 @@ import { $, getRefs } from '@windy/utils';
 import { map } from '@windy/map';
 import bcast from '@windy/broadcast';
 
-
-import * as  singleclick from '@windy/singleclick';
+import * as singleclick from '@windy/singleclick';
 
 import config from './pluginConfig.js';
 const { name } = config;
 
-
 import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
 
-import { getPickerMarker } from './picker-src/picker.js';
+import { getPickerMarker } from './picker.js';
 
 let thisPlugin;
 let refs, node;
@@ -56,12 +54,11 @@ function init(plgn) {
     pickerT.onOpen(pickerOpenOrMoved);
     pickerT.onClose(clearAsp);
 
-
     thisPlugin.closeCompletely = closeCompletely;
-};
+}
 
 function closeCompletely() {
-    console.log("Airspaces closing completely");
+    console.log('Airspaces closing completely');
 
     removeGlobalCss();
 
@@ -71,7 +68,7 @@ function closeCompletely() {
     pickerT.remRightPlugin(name);
     // pickerT.removeMarker();  // not needed
 
-    singleclick.release(name, "high");
+    singleclick.release(name, 'high');
     singleclick.singleclick.off(name, pickerT.openMarker);
 
     bcast.off('pluginOpened', onPluginOpened);
@@ -87,36 +84,30 @@ function closeCompletely() {
     hasHooks = false;
 }
 
-
+//  VERY important:
 function onPluginOpened(p) {
     // other plugins do not get priority back,  when reopened,  like better sounding.
     if (W.plugins[p].listenToSingleclick && W.plugins[p].singleclickPriority == 'high') {
-        console.log("single click to", p);
+        console.log('single click to', p);
         singleclick.register(p, 'high');
     }
 
     if (p.includes('windy-plugin') && p !== name) {
         clearAsp(); //clears highlighted airspaces only,   if the plugin is still active,  moving the picker will still highlight.
     }
-
 }
 function onPluginClosed(p) {
     // if the plugin closed has high singleclickpriority,  it returns single click to default picker,
     // so instead register this plugin as priority high
-    console.log("on plugin closed", p, "this plugin gets priority", name);
+    console.log('on plugin closed', p, 'this plugin gets priority', name);
     if (p !== name && W.plugins[p].singleclickPriority == 'high') singleclick.register(name, 'high');
 }
-
 
 function pickerOpenOrMoved(c) {
     console.log('picker open or moved in airspases', c);
     if (!c) return;
     if (pickerT.getRightPlugin() != name) {
-        console.log(
-            'Airspaces cannot use right div because',
-            pickerT.getRightPlugin(),
-            'is using it',
-        );
+        console.log('Airspaces cannot use right div because', pickerT.getRightPlugin(), 'is using it');
         return;
     }
 
@@ -125,28 +116,7 @@ function pickerOpenOrMoved(c) {
 
 ////can be cut from here if not windy module
 
-//let map;
-let mapLibre;
-
-/**
- * @param m - leaflet map
- * @desc - in Windy map = W.map.map,  reference2map not called
- **/
-/*
- function reference2map(m, mL) {
-    if (m) map = m;
-    if (mL) mapLibre = mL;
-}
-*/
-
-/*
-function appendAspListToDiv(divId) {
-    document.querySelector('#' + divId).appendChild(refs.mainDiv);
-}
-*/
-
-let
-    url1 = 'https://www.flymap.org.za/openaip/geojsonbr/',
+let url1 = 'https://www.flymap.org.za/openaip/geojsonbr/',
     url2 = 'https://www.flymap.co.za/openaipgeojson/';
 let url = url1;
 
@@ -156,7 +126,6 @@ let typeOrIcao = 'type';
 let position;
 let aspOpac = 0.5;
 let prevLayerAr = []; //previously found layers
-const mapLibreSources = [];
 
 const createListDiv = (s, col = 'transparent') => {
     let div = document.createElement('div');
@@ -183,7 +152,7 @@ const fetchSchema = fetchTries => {
         if (schema) res(schema);
         else
             res(
-                fetch(url + php + 'schema.json' ,{ cache: noCache ? 'reload' : 'default' })
+                fetch(url + php + 'schema.json', { cache: noCache ? 'reload' : 'default' })
                     .then(r => r.json())
                     .then(r => {
                         schema = r;
@@ -277,7 +246,7 @@ const fetchCountryList = fetchTries => {
         if (countries) res(countries);
         else
             res(
-                fetch(url + php + 'countries.json' ,{ cache: noCache ? 'reload' : 'default' })
+                fetch(url + php + 'countries.json', { cache: noCache ? 'reload' : 'default' })
                     .then(r => r.json())
                     .then(r => {
                         r.sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -288,29 +257,19 @@ const fetchCountryList = fetchTries => {
             );
     })
         .then(() => {
-            //http.get(url + php + 'countries.json').then(d => {return d.data})//.then(r => JSON.parse(r))
-            //countryFetchPromise = fetch(url + php + 'countries.json')
-            //    .then(r => r.json())
-            //    .then(r => {
-
-            //countries = r;
             console.log('countries fetched', countries);
             countries.forEach((e, i) => {
                 let countryCode = e.name.slice(-2);
                 let s = e.name.slice(0, -3);
                 s = s[0].toUpperCase() + s.slice(1);
-                for (let j = 0, l = s.length; j < l; j++)
-                    if (s[j] == '_')
-                        s = s.slice(0, j) + ' ' + s[j + 1].toUpperCase() + s.slice(j + 2);
+                for (let j = 0, l = s.length; j < l; j++) if (s[j] == '_') s = s.slice(0, j) + ' ' + s[j + 1].toUpperCase() + s.slice(j + 2);
                 s += ' (' + countryCode + ')';
                 let cntdiv = createListDiv(s);
                 e.cntdiv = cntdiv;
                 cntdiv.addEventListener('click', () => {
                     if (!(countries[i].gjLayer || countries[i].mlLayer)) {
                         cntdiv.classList.add('highlight', 'loading-asp');
-                        fetchAsp(i, true).then(() =>
-                            setTimeout(() => cntdiv.classList.remove('loading-asp'), 100),
-                        );
+                        fetchAsp(i, true).then(() => setTimeout(() => cntdiv.classList.remove('loading-asp'), 100));
                     } else {
                         ////
                         removeLayer(i);
@@ -356,17 +315,11 @@ const fetchCountryList = fetchTries => {
             } else if (fetchTries < 6) {
                 url = url2;
                 setTimeout(fetchCountryList, 2000, fetchTries + 1);
-            } else
-                refs.aipDiv.innerHTML =
-                    'Failed to load country list.<br>You can try to reload plugin.';
+            } else refs.aipDiv.innerHTML = 'Failed to load country list.<br>You can try to reload plugin.';
         });
 };
 
-////drag
-
-/////
-
-/////  map interaction,   either  leaflet or mapLibre
+/////  map interaction  LEAFLET
 
 function loadGeoJson2Leaflet(i) {
     countries[i].gjLayer = L.geoJSON(countries[i].asp, {
@@ -380,95 +333,16 @@ function loadGeoJson2Leaflet(i) {
             };
         },
         onEachFeature: (feature, layer) => {
-            countries[i].asp.features.find(
-                f => f.properties._id == feature.properties._id,
-            ).featureLayer = layer;
+            countries[i].asp.features.find(f => f.properties._id == feature.properties._id).featureLayer = layer;
         },
     }).addTo(map);
-}
-
-function loadGeoJson2mapLibre(i) {
-    let n = countries[i].name;
-
-    if (!mapLibreSources.includes(n)) {
-        const filter = (k, v) => {
-            if (k == 'featureLayer') return undefined;
-            else return v;
-        };
-        let clone = JSON.parse(JSON.stringify(countries[i].asp, filter));
-        clone.features.forEach(f => {
-            f.properties.ulval =
-                f.properties.ul.value *
-                (f.properties.ul.unit == 1 ? 0.3048 : f.properties.ul.unit == 6 ? 30.48 : 1);
-            f.properties.llval =
-                f.properties.ll.value *
-                (f.properties.ll.unit == 1 ? 0.3048 : f.properties.ll.unit == 6 ? 30.48 : 1);
-        });
-        let cloneGJ = {
-            type: 'geojson',
-            data: clone,
-            promoteId: '_id',
-        };
-
-        mapLibreSources.push(n);
-        mapLibre.addSource(n, cloneGJ);
-    }
-
-    let lineColor = ['case'];
-    for (let type = 1; type <= 3; type++) {
-        lineColor.push(['==', ['get', 'type'], type], aspColor({ type }));
-    }
-    for (let icao = 0; icao <= 8; icao++) {
-        lineColor.push(['==', ['get', 'icao'], icao], aspColor({ icao }));
-    }
-    lineColor.push('black');
-
-    mapLibre.addLayer({
-        id: n,
-        type: 'line',
-        source: n,
-        layout: {
-            'line-join': 'round',
-            'line-cap': 'round',
-        },
-        paint: {
-            'line-color': lineColor,
-            'line-opacity': [
-                'case',
-                ['boolean', ['feature-state', 'no-highlight'], true],
-                aspOpac,
-                1,
-            ],
-            'line-width': ['case', ['boolean', ['feature-state', 'no-highlight'], true], 1, 3],
-        },
-    });
-
-    for (let ic = 0; ic < 9; ic++) {
-        let shift = (ic + 1) * 10;
-        mapLibre.addLayer({
-            id: n + '_extrusion_' + ic,
-            type: 'fill-extrusion',
-            source: n, //+'_extrusion',
-            filter: ['==', ['get', 'icao'], ic],
-            paint: {
-                'fill-extrusion-color': lineColor,
-                'fill-extrusion-height': ['number', ['-', ['get', 'ulval'], shift]],
-                'fill-extrusion-base': ['number', ['+', ['get', 'llval'], shift]],
-                'fill-extrusion-opacity': 0.2,
-            },
-            layout: {
-                visibility: on3d ? 'visible' : 'none',
-            },
-        });
-    }
-    countries[i].mlLayer = true;
 }
 
 function filterTypeIcao() {
     const availType = [],
         availIcao = [];
     countries.forEach(c => {
-        if ((map && !c.gjLayer) || (mapLibre && !c.mlLayer)) return;
+        if (!c.gjLayer) return;
         c.asp.features.forEach(({ properties: { type, icao } }) => {
             if (!availType.includes(type)) availType.push(type);
             if (!availIcao.includes(icao)) availIcao.push(icao);
@@ -486,49 +360,18 @@ function filterTypeIcao() {
 }
 
 function load(i) {
-    if (map) loadGeoJson2Leaflet(i);
-    if (mapLibre) loadGeoJson2mapLibre(i);
+    loadGeoJson2Leaflet(i);
     filterTypeIcao();
 }
 
 function removeLayer(i) {
-    if (map) {
-        map.removeLayer(countries[i].gjLayer);
-        delete countries[i].gjLayer;
-    }
-    if (mapLibre) {
-        mapLibre.removeLayer(countries[i].name);
-        mapLibre.removeLayer(countries[i].name + '_extrusion');
-        countries[i].mlLayer = false;
-    }
+    map.removeLayer(countries[i].gjLayer);
+    delete countries[i].gjLayer;
     filterTypeIcao();
 }
 
-//only for mapLibre
-function toggleExtrusion(on) {
-    on3d = on;
-    if (mapLibre) {
-        countries.forEach(c => {
-            //console.log(c);
-            if (c.mlLayer) {
-                //console.log(c.name);
-                mapLibre.setLayoutProperty(
-                    c.name + '_extrusion',
-                    'visibility',
-                    on ? 'visible' : 'none',
-                );
-            }
-        });
-    }
-}
-
 function fitBounds(bnds) {
-    if (map) map.fitBounds(bnds);
-    if (mapLibre)
-        mapLibre.fitBounds([
-            [bnds[0][1], bnds[0][0]],
-            [bnds[1][1], bnds[1][0]],
-        ]);
+    map.fitBounds(bnds);
 }
 
 /**
@@ -537,58 +380,24 @@ function fitBounds(bnds) {
  * @param ix : index of schemaSelected,  if undefined,  then use position 0,  all will be the same
  **/
 function applyFilter(k, c, ix) {
-    if (map) {
-        if (c.gjLayer) {
-            c.asp.features.forEach(f => {
-                if (f.properties[k] == ix || ix === undefined) {
-                    //f.featureLayer.setStyle({ opacity: schemaSel[k][ix === undefined ? 0 : ix] ? aspOpac : 0 });
-                    let keep = schemaSel[k][ix === undefined ? 0 : ix];
-                    f.featureLayer[keep ? 'addTo' : 'remove'](map);
-                }
-            });
-        }
-    }
-
-    if (mapLibre) {
-        if (mapLibre.getLayer(c.name)) {
-            mapLibre.setFilter(c.name, [
-                'boolean',
-                ['at', ['get', k], ['literal', schemaSel[k]]],
-            ]);
-            mapLibre.setFilter(c.name + '_extrusion', [
-                'boolean',
-                ['at', ['get', k], ['literal', schemaSel[k]]],
-            ]);
-        }
+    if (c.gjLayer) {
+        c.asp.features.forEach(f => {
+            if (f.properties[k] == ix || ix === undefined) {
+                //f.featureLayer.setStyle({ opacity: schemaSel[k][ix === undefined ? 0 : ix] ? aspOpac : 0 });
+                let keep = schemaSel[k][ix === undefined ? 0 : ix];
+                f.featureLayer[keep ? 'addTo' : 'remove'](map);
+            }
+        });
     }
 }
 
-function highLightFeature(f, country) {
-    if (map) {
-        f.featureLayer.setStyle({ color: aspColor(f.properties), weight: 2, opacity: 1 });
-    }
-    if (mapLibre) {
-        mapLibre.setFeatureState(
-            { source: country, id: f.properties._id },
-            { 'no-highlight': false },
-        );
-    }
+function highLightFeature(f) {
+    f.featureLayer.setStyle({ color: aspColor(f.properties), weight: 2, opacity: 1 });
 }
 
-function removeHighLight(f, country) {
-    if (map) {
-        let opacity =
-            schemaSel.type[f.properties.type] && schemaSel.icao[f.properties.icao]
-                ? aspOpac
-                : 0;
-        f.featureLayer.setStyle({ color: aspColor(f.properties), weight: 1, opacity });
-    }
-    if (mapLibre) {
-        mapLibre.setFeatureState(
-            { source: country, id: f.properties._id },
-            { 'no-highlight': true },
-        );
-    }
+function removeHighLight(f) {
+    let opacity = schemaSel.type[f.properties.type] && schemaSel.icao[f.properties.icao] ? aspOpac : 0;
+    f.featureLayer.setStyle({ color: aspColor(f.properties), weight: 1, opacity });
 }
 
 ///// end of map interaction
@@ -606,7 +415,9 @@ const fetchAsp = function (i, fitbnds, cbf) {
     if (!countries[i].fetched) {
         countries[i].fetched = true;
         //http.get(`${url+php}${countries[i].name}.geojson`).then(d => d.data).then(r => {
-        return fetch(`${url + php}${countries[i].name}.geojson` ,{ cache: noCache ? 'reload' : 'default' })
+        return fetch(`${url + php}${countries[i].name}.geojson`, {
+            cache: noCache ? 'reload' : 'default',
+        })
             .then(r => r.json())
             .then(r => {
                 countries[i].asp = r; //JSON.parse(r);
@@ -626,11 +437,7 @@ const fetchAsp = function (i, fitbnds, cbf) {
 
 const aspColor = function (p) {
     let n =
-        p.type !== void 0 && Number(p.type) >= 1 && Number(p.type <= 3)
-            ? schema.type[p.type]
-            : p.icao !== void 0
-                ? schema.icao[p.icao]
-                : 'default';
+        p.type !== void 0 && Number(p.type) >= 1 && Number(p.type <= 3) ? schema.type[p.type] : p.icao !== void 0 ? schema.icao[p.icao] : 'default';
 
     let light = true;
 
@@ -702,25 +509,25 @@ const aspColor = function (p) {
     }
 };
 
-
 function fetchSchemaAndCountries() {
-    return fetchLastUpdate(0).then(upd => {
-        if ((Date.now() - new Date(upd.lastUpdate).getTime()) > 24 * 60 * 60000) {
-            console.log(upd.lastUpdate, Date.now() - new Date(upd.lastUpdate).getTime());
-            noCache = true;
-            console.log("do not use cached data");
-            return fetchLastUpdate(0);
-        } else {
-            console.log("using cached data");
-        }
-    }).then(() =>
-        Promise.all([fetchSchema(0), fetchCountryList(0)]).then(() => {
-            //may already be loaded countries
-            filterTypeIcao();
+    return fetchLastUpdate(0)
+        .then(upd => {
+            if (Date.now() - new Date(upd.lastUpdate).getTime() > 24 * 60 * 60000) {
+                console.log(upd.lastUpdate, Date.now() - new Date(upd.lastUpdate).getTime());
+                noCache = true;
+                console.log('do not use cached data');
+                return fetchLastUpdate(0);
+            } else {
+                console.log('using cached data');
+            }
         })
-    );
+        .then(() =>
+            Promise.all([fetchSchema(0), fetchCountryList(0)]).then(() => {
+                //may already be loaded countries
+                filterTypeIcao();
+            }),
+        );
 }
-
 
 //  point-in-polygon
 const checkPoly = function (point, vs) {
@@ -799,16 +606,12 @@ function findAsp(e, showInInfo) {
 
         /** b: [[ minlat , minlng], [maxlat, maxlng]],
          *  c: [lat,lng] */
-        const contains = (b, cc) =>
-            cc[0] >= b[0][0] && cc[0] <= b[1][0] && cc[1] >= b[0][1] && cc[1] <= b[1][1];
+        const contains = (b, cc) => cc[0] >= b[0][0] && cc[0] <= b[1][0] && cc[1] >= b[0][1] && cc[1] <= b[1][1];
 
         const cntryBounds = i => countries[i].bounds.some(bb => contains(bb, cc));
 
         for (let i = 0; i < countries.length; i++) {
-            if (
-                (countries[i].gjLayer || (mapLibre && mapLibre.getLayer(countries[i].name))) &&
-                cntryBounds(i)
-            ) {
+            if (countries[i].gjLayer && cntryBounds(i)) {
                 let { features } = countries[i].asp;
                 features.forEach(f => {
                     if (
@@ -835,8 +638,6 @@ function findAsp(e, showInInfo) {
         txt = makeText4Picker(aspAr);
         prevLayerAr = layerAr.map(e => e);
     }
-    //console.log('TXT', txt);
-    //console.log(refs);
 
     refs.aipInfo.innerHTML = makeText4Info(aspAr);
 
@@ -851,14 +652,9 @@ function clearAsp() {
 
 function removeAllAsp() {
     countries.forEach(c => {
-        if (map && c.gjLayer) {
+        if (c.gjLayer) {
             map.removeLayer(c.gjLayer);
             delete c.gjLayer;
-        }
-        if (mapLibre && c.mlLayer) {
-            mapLibre.removeLayer(c.name);
-            mapLibre.removeLayer(c.name + '_extrusion');
-            c.mlLayer = false;
         }
         c.cntdiv.classList.remove('highlight');
     });
@@ -901,7 +697,6 @@ let exports = {
     load,
     setOpac,
     getOpac,
-    //    toggleExtrusion, //only applicable for mapLibre
 };
 
 export { exports, init, closeCompletely };

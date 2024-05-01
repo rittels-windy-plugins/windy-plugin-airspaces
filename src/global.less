@@ -2,7 +2,6 @@
 
 @name: windy-plugin-airspaces;
 
-
 .on@{name}.on@{name}-info {
     #search {
         display: none;
@@ -14,8 +13,7 @@
 }
 
 #@{name}-info {
-
-    display:none;
+    display: none;
 
     .on@{name}.on@{name}-info & {
         display: block;
@@ -29,36 +27,35 @@
     }
 
     .list-line-div {
-        margin     : 1px;
-        border     : 0px;
-        font-size  : 13px;
+        margin: 1px;
+        border: 0px;
+        font-size: 13px;
         line-height: 1.3;
         margin-left: 15px;
 
         .bullet {
-            height       : 8px;
-            width        : 8px;
+            height: 8px;
+            width: 8px;
             border-radius: 8px;
-            border       : 1px solid;
-            display      : inline-block;
-            margin-right : 10px;
-            opacity      : 0;
+            border: 1px solid;
+            display: inline-block;
+            margin-right: 10px;
+            opacity: 0;
         }
 
-
         .list-line-div-txt {
-            padding      : 1px;
-            cursor       : pointer;
+            padding: 1px;
+            cursor: pointer;
             border-radius: 3px;
-            width        : fit-contents;
-            opacity      : 0.8;
+            width: fit-contents;
+            opacity: 0.8;
         }
 
         &.highlight {
             .list-line-div-txt {
                 font-weight: bold;
-                //font-size: 14px; 
-                opacity    : 1;
+                //font-size: 14px;
+                opacity: 1;
             }
 
             .bullet {
@@ -77,25 +74,25 @@
         .closing-x-small {
             //font-family: iconfont;
             //font-variant: normal;
-            text-transform  : none;
-            line-height     : 1.3;
-            color           : white;
-            background-color: #9D0300;
-            cursor          : pointer;
-            position        : absolute;
-            margin          : 2px 0px 0px 12px;
-            font-size       : 10px;
-            z-index         : 10;
-            width           : 1.3em;
-            height          : 1.3em;
-            border-radius   : 1.3em;
-            display         : none;
-            opacity         : 0.5;
-            text-align      : center;
+            text-transform: none;
+            line-height: 1.3;
+            color: white;
+            background-color: #9d0300;
+            cursor: pointer;
+            position: absolute;
+            margin: 2px 0px 0px 12px;
+            font-size: 10px;
+            z-index: 10;
+            width: 1.3em;
+            height: 1.3em;
+            border-radius: 1.3em;
+            display: none;
+            opacity: 0.5;
+            text-align: center;
         }
 
         .closing-x-small::before {
-            content: "\\2716";
+            content: '\\2716';
         }
 
         &:hover .closing-x-small {
@@ -104,7 +101,7 @@
 
         &:hover .list-line-div-txt {
             background-color: rgba(0, 0, 0, 0.3);
-            padding         : 0px 4px 0px 4px;
+            padding: 0px 4px 0px 4px;
         }
 
         &.hidden {

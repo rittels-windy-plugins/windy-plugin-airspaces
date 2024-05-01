@@ -1,62 +1,93 @@
-//.plugin__content {
-//padding: 10px !important;
+@name: windy-plugin-airspaces;
+@width : 350px;
+@bottom: 150px;
 
-
-[data-ref="mainDiv"] {
-
-    display                     : none;
-    position                    : fixed;
-    left                        : 5px;
-    width                       : 300px;
-    //height                    : 300px;
-    top                         : 5px;
-    bottom                      : 150px;
-    border-radius               : 10px;
-    padding                     : 5px;
-
-
-    .add-scroll-bar {
-        &::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        &::-webkit-scrollbar-thumb {
-            background: rgba(128, 128, 128, .5);
-        }
-
-        &::-webkit-scrollbar-track {
-            background: 0 0;
-        }
+.add-scroll-bar {
+    &::-webkit-scrollbar {
+        width: 8px;
     }
 
-    [data-ref="aipDiv"] {
-        position     : absolute;
-        top          : 50px; // !important;
-        width        : 100%;
-        border-style : solid; // !important;
-        border-width : 0.75px 0px; // !important;
-        border-color : rgba(128, 128, 128, 0.5); // !important;
+    &::-webkit-scrollbar-thumb {
+        background: rgba(128, 128, 128, .5);
+    }
+
+    &::-webkit-scrollbar-track {
+        background: 0 0;
+    }
+}
+
+#@{name}-info {
+
+    // display: none;  cannot be here
+    position: fixed;
+    left: 5px;
+    width: @width;
+    top: 5px;
+    bottom: @bottom;
+    border-radius: 10px;
+    padding: 5px;
+
+    .closing-x {
+        display: block;
+        right: -15px;
+        top: -10px;
+        font-size: 30px;
+        margin: 5px;
+    }
+
+    .corner-handle {
+        box-sizing: border-box;
+        height: 40px;
+        width: 40px;
+        position: absolute;
+        margin-left: -18px;
+        margin-top: -18px;
+        left: 100%;
+        top: 100%;
+        cursor: nwse-resize;
+
+        &::before {
+            content: ' ';
+            box-sizing: border-box;
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 20px;
+            height: 20px;
+            border-bottom: 5px solid rgba(230, 230, 230, 0.5);
+            border-right: 5px solid rgba(230, 230, 230, 0.5);
+            border-bottom-right-radius: 10px;
+            background-color: transparent;
+        }
+    }    
+
+    .scrollable {   
+        position: absolute;
+        top: 50px; // !important;
+        width: 100%;
+        border-style: solid; // !important;
+        border-width: 0.75px 0px; // !important;
+        border-color: rgba(128, 128, 128, 0.5); // !important;
         border-radius: 0px; // !important;
-        color        : inherit; // !important;
-        overflow-y   : scroll;
+        color: inherit; // !important;
+        overflow-y: scroll;
 
         .add-scroll-bar();
 
         .section-head {
-            position   : relative;
-            font-size  : 16px;
+            position: relative;
+            font-size: 16px;
             line-height: 1.4em;
         }
 
         .section-checkbox {
-            font-size         : 16px;
+            font-size: 16px;
             -webkit-appearance: none;
-            appearance        : none;
-            background-color  : transparent;
-            width             : 30px;
-            color             : inherit; // !important;
-            cursor            : pointer;
-
+            appearance: none;
+            background-color: transparent;
+            width: 30px;
+            color: inherit; // !important;
+            cursor: pointer;
         }
 
         .section-checkbox:focus {
@@ -69,18 +100,18 @@
 
         .section-checkbox:checked::before {
             padding-top: 3px;
-            content    : '\25B7\00a0\00a0';
+            content: '\25B7\00a0\00a0';
         }
 
         .space-div {
             height: 2px;
         }
 
-        .section-checkbox:checked+label+.space-div {
+        .section-checkbox:checked + label + .space-div {
             height: 10px;
         }
 
-        .section-checkbox:checked+label+.space-div+div {
+        .section-checkbox:checked + label + .space-div + div {
             display: none;
         }
 
@@ -94,92 +125,55 @@
     }
 
     .aipHead {
-        position     : relative;
-        font-size    : 20px !important;
-        font-weight  : bold;
-        padding      : 0.5em;
+        position: relative;
+        font-size: 20px !important;
+        font-weight: bold;
+        padding: 0.5em;
         //margin     : 1px 0px 0px 1px;
     }
 
     .aipInfo {
-        position    : absolute;
-        overflow-y  : scroll;
-        padding     : 5px;
-        font-size   : 11px;
-        bottom      : 27px;
-        width       : 100%;
+        position: absolute;
+        overflow-y: scroll;
+        padding: 5px;
+        font-size: 11px;
+        bottom: 27px;
+        width: 100%;
         border-style: solid; // !important;
         border-width: 1px 0px; // !important;
         border-color: rgba(128, 128, 128, 0.5); // !important;
-        color       : inherit;
+        color: inherit;
         .add-scroll-bar();
     }
 
     .aipFoot {
-        position   : absolute;
-        font-size  : 9px;
-        bottom     : 0px;
-        height     : 27px;
+        position: absolute;
+        font-size: 9px;
+        bottom: 0px;
+        height: 27px;
         margin-left: 1px;
     }
 
     .drag-handle {
-        box-sizing : border-box;
-        height     : 30px;
-        width      : 90px;
-        position   : absolute;
+        box-sizing: border-box;
+        height: 30px;
+        width: 90px;
+        position: absolute;
         margin-left: -45px;
-        margin-top : -15px;
-        left       : 50%;
-        cursor     : ns-resize;
+        margin-top: -15px;
+        left: 50%;
+        cursor: ns-resize;
 
         &::before {
-            content         : ' ';
-            box-sizing      : border-box;
-            position        : absolute;
-            left            : 30px;
-            top             : 11px;
-            width           : 30px;
-            height          : 8px;
-            border-radius   : 4px;
+            content: ' ';
+            box-sizing: border-box;
+            position: absolute;
+            left: 30px;
+            top: 11px;
+            width: 30px;
+            height: 8px;
+            border-radius: 4px;
             background-color: rgba(230, 230, 230, 0.5);
         }
-    }
-
-    .corner-handle {
-        box-sizing : border-box;
-        height     : 40px;
-        width      : 40px;
-        position   : absolute;
-        margin-left: -18px;
-        margin-top : -18px;
-        left       : 100%;
-        top        : 100%;
-        cursor: nwse-resize;
-
-        //top: calc(100% - 120px);
-        //border: 2px solid blue;
-        &::before {
-            content                   : ' ';
-            box-sizing                : border-box;
-            position                  : absolute;
-            left                      : 0px;
-            top                       : 0px;
-            width                     : 20px;
-            height                    : 20px;
-            border-bottom             : 5px solid rgba(230,230,230, .5);
-            border-right              : 5px solid rgba(230,230,230, .5);
-            border-bottom-right-radius: 10px;
-            background-color          : transparent;
-        }
-    }
-
-
-    .closing-x {
-        display  : block;
-        right    : -15px;
-        top      : -10px;
-        font-size: 30px;
-        margin   : 5px;
     }
 }
