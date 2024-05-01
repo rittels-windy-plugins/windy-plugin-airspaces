@@ -1,19 +1,21 @@
-.plugin__content {
-    //padding: 10px !important;
+//.plugin__content {
+//padding: 10px !important;
 
-    [data-ref="aipDiv"] {
-        position        : absolute;
-        top             : 60px !important;
-        //bottom: 120px;
-        width           : 90%;
-        background-color: transparent !important;
-        border-style    : solid !important;
-        border-width    : 0.75px 0px !important;
-        border-color    : rgba(128, 128, 128, 0.5) !important;
-        border-radius   : 0px !important;
-        color           : inherit !important;
-        overflow-y      : scroll;
 
+[data-ref="mainDiv"] {
+
+    display                     : none;
+    position                    : fixed;
+    left                        : 5px;
+    width                       : 300px;
+    //height                    : 300px;
+    top                         : 5px;
+    bottom                      : 150px;
+    border-radius               : 10px;
+    padding                     : 5px;
+
+
+    .add-scroll-bar {
         &::-webkit-scrollbar {
             width: 8px;
         }
@@ -25,6 +27,20 @@
         &::-webkit-scrollbar-track {
             background: 0 0;
         }
+    }
+
+    [data-ref="aipDiv"] {
+        position     : absolute;
+        top          : 50px; // !important;
+        width        : 100%;
+        border-style : solid; // !important;
+        border-width : 0.75px 0px; // !important;
+        border-color : rgba(128, 128, 128, 0.5); // !important;
+        border-radius: 0px; // !important;
+        color        : inherit; // !important;
+        overflow-y   : scroll;
+
+        .add-scroll-bar();
 
         .section-head {
             position   : relative;
@@ -38,7 +54,7 @@
             appearance        : none;
             background-color  : transparent;
             width             : 30px;
-            color             : inherit !important;
+            color             : inherit; // !important;
             cursor            : pointer;
 
         }
@@ -78,31 +94,25 @@
     }
 
     .aipHead {
-        position   : absolute;
-        font-size  : 20px !important;
-        font-weight: bold;
-        //height     : 25px;
-        margin     : 1px 0px 0px 1px;
+        position     : relative;
+        font-size    : 20px !important;
+        font-weight  : bold;
+        padding      : 0.5em;
+        //margin     : 1px 0px 0px 1px;
     }
 
     .aipInfo {
-        position        : absolute;
-        overflow-y      : scroll;
-        padding         : 5px;
-        font-size       : 11px;
-        color           : black;
-        bottom          : 27px;
-        //top: calc(100% - 120px) !important;
-        //height:  90px;
-        width           : 100%;
-        overflow-y      : scroll;
-        background-color: transparent !important;
-        border-style    : solid !important;
-        border-width    : 1px 0px !important;
-        border-color    : rgba(128, 128, 128, 0.5) !important;
-        border-radius   : 0px !important;
-        color           : inherit !important;
-
+        position    : absolute;
+        overflow-y  : scroll;
+        padding     : 5px;
+        font-size   : 11px;
+        bottom      : 27px;
+        width       : 100%;
+        border-style: solid; // !important;
+        border-width: 1px 0px; // !important;
+        border-color: rgba(128, 128, 128, 0.5); // !important;
+        color       : inherit;
+        .add-scroll-bar();
     }
 
     .aipFoot {
@@ -120,30 +130,56 @@
         position   : absolute;
         margin-left: -45px;
         margin-top : -15px;
-        left       : calc(50%);
-        cursor     : pointer;
+        left       : 50%;
+        cursor     : ns-resize;
 
-        //top: calc(100% - 120px);
-        //border: 2px solid blue;
         &::before {
             content         : ' ';
             box-sizing      : border-box;
             position        : absolute;
             left            : 30px;
-            top             : 10px;
+            top             : 11px;
             width           : 30px;
-            height          : 10px;
-            border          : 1px solid rgba(150, 150, 150, 1);
+            height          : 8px;
             border-radius   : 4px;
             background-color: rgba(230, 230, 230, 0.5);
         }
     }
-}
+
+    .corner-handle {
+        box-sizing : border-box;
+        height     : 40px;
+        width      : 40px;
+        position   : absolute;
+        margin-left: -18px;
+        margin-top : -18px;
+        left       : 100%;
+        top        : 100%;
+        cursor: nwse-resize;
+
+        //top: calc(100% - 120px);
+        //border: 2px solid blue;
+        &::before {
+            content                   : ' ';
+            box-sizing                : border-box;
+            position                  : absolute;
+            left                      : 0px;
+            top                       : 0px;
+            width                     : 20px;
+            height                    : 20px;
+            border-bottom             : 5px solid rgba(230,230,230, .5);
+            border-right              : 5px solid rgba(230,230,230, .5);
+            border-bottom-right-radius: 10px;
+            background-color          : transparent;
+        }
+    }
 
 
-.closing-x {
-    display  : block;
-    right    : 0px;
-    top      : 0.25em;
-    font-size: 30px;
+    .closing-x {
+        display  : block;
+        right    : -15px;
+        top      : -10px;
+        font-size: 30px;
+        margin   : 5px;
+    }
 }

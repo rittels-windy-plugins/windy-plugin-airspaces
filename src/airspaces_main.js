@@ -1,29 +1,33 @@
 import plugins from '@windy/plugins';
-import utils from '@windy/utils';
+import { $, getRefs } from '@windy/utils';
 import { map } from '@windy/map';
 import bcast from '@windy/broadcast';
-import { emitter as picker } from '@windy/picker';
-import rs from '@windy/rootScope';
-const { $, getRefs } = utils;
 
-import config from './pluginConfig';
+
+import * as  singleclick from '@windy/singleclick';
+
+import config from './pluginConfig.js';
 const { name } = config;
-import { loadPlugins } from './loadPlugins.js';
-import {  insertGlobalCss, removeGlobalCss } from './globalCss.js';
+
+
+import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
+
+import { getPickerMarker } from './picker-src/picker.js';
 
 let thisPlugin;
 let refs, node;
 
 let hasHooks = false;
 
-let pickerT, embedbox;  // while embedbox is not used,  it must still be opened.
+let pickerT;
 
-const whichPicker = () => (rs.isMobileOrTablet ? 'picker-mobile' : 'picker');
+let noCache = false;
+
+//const whichPicker = () => (rs.isMobileOrTablet ? 'picker-mobile' : 'picker');
 
 let countries,
     schema,
     schemaSel = [];
-
 
 function init(plgn) {
     //grab node and refs
@@ -34,38 +38,45 @@ function init(plgn) {
     ({ node } = thisPlugin.window);
     ({ refs } = getRefs(node));
 
-    loadPlugins().then(mods => ({ pickerT, embedbox } = mods)).then(() => {
-        pickerT.addRightPlugin(name); // only use the right div
-        pickerT.drag(pickerOpenOrMoved, 350); //every 350ms: callbackfx is called
-        let c = pickerT.getParams();
-        if (c) pickerOpenOrMoved(c);
-    });
+    // important to close picker
+    bcast.fire('rqstClose', 'picker');
+
+    pickerT = getPickerMarker();
+    pickerT.addRightPlugin(name); // only use the right div
 
     if (hasHooks) return;
 
+    singleclick.singleclick.on(name, pickerT.openMarker);
+    bcast.on('pluginOpened', onPluginOpened);
+    bcast.on('pluginClosed', onPluginClosed);
+
     insertGlobalCss();
     fetchSchemaAndCountries();
-    picker.on('pickerOpened', pickerOpenOrMoved);
-    picker.on('pickerMoved', pickerOpenOrMoved);
-    picker.on('pickerClosed', clearAsp);
-    bcast.on('pluginOpened', onPluginOpened);
+    pickerT.onDrag(pickerOpenOrMoved, 350); //every 350ms: callbackfx is called
+    pickerT.onOpen(pickerOpenOrMoved);
+    pickerT.onClose(clearAsp);
+
+
     thisPlugin.closeCompletely = closeCompletely;
 };
-
-
 
 function closeCompletely() {
     console.log("Airspaces closing completely");
 
     removeGlobalCss();
 
-    picker.off('pickerOpened', pickerOpenOrMoved);
-    picker.off('pickerMoved', pickerOpenOrMoved);
-    pickerT.dragOff(pickerOpenOrMoved);
-
+    pickerT.offOpen(pickerOpenOrMoved);
+    pickerT.offClose(clearAsp);
+    pickerT.offDrag(pickerOpenOrMoved);
     pickerT.remRightPlugin(name);
+    // pickerT.removeMarker();  // not needed
 
-    bcast.on('pluginOpened', onPluginOpened);
+    singleclick.release(name, "high");
+    singleclick.singleclick.off(name, pickerT.openMarker);
+
+    bcast.off('pluginOpened', onPluginOpened);
+    bcast.off('pluginClosed', onPluginClosed);
+
     removeAllAsp();
     thisPlugin.isActive = false;
 
@@ -78,10 +89,24 @@ function closeCompletely() {
 
 
 function onPluginOpened(p) {
+    // other plugins do not get priority back,  when reopened,  like better sounding.
+    if (W.plugins[p].listenToSingleclick && W.plugins[p].singleclickPriority == 'high') {
+        console.log("single click to", p);
+        singleclick.register(p, 'high');
+    }
+
     if (p.includes('windy-plugin') && p !== name) {
         clearAsp(); //clears highlighted airspaces only,   if the plugin is still active,  moving the picker will still highlight.
     }
+
 }
+function onPluginClosed(p) {
+    // if the plugin closed has high singleclickpriority,  it returns single click to default picker,
+    // so instead register this plugin as priority high
+    console.log("on plugin closed", p, "this plugin gets priority", name);
+    if (p !== name && W.plugins[p].singleclickPriority == 'high') singleclick.register(name, 'high');
+}
+
 
 function pickerOpenOrMoved(c) {
     console.log('picker open or moved in airspases', c);
@@ -94,7 +119,8 @@ function pickerOpenOrMoved(c) {
         );
         return;
     }
-    pickerT[whichPicker() == 'picker-mobile' ? 'fillLeftDiv' : 'fillRightDiv'](findAsp(c).txt);
+
+    pickerT.fillRightDiv(findAsp(c).txt);
 }
 
 ////can be cut from here if not windy module
@@ -119,9 +145,8 @@ function appendAspListToDiv(divId) {
 }
 */
 
-let url3 = 'https://www.openaipgeojson.com/',
+let
     url1 = 'https://www.flymap.org.za/openaip/geojsonbr/',
-    //url1 = 'https://www.clreis.co.za/airspace_redirect/',
     url2 = 'https://www.flymap.co.za/openaipgeojson/';
 let url = url1;
 
@@ -132,9 +157,6 @@ let position;
 let aspOpac = 0.5;
 let prevLayerAr = []; //previously found layers
 const mapLibreSources = [];
-
-let text4Info;
-
 
 const createListDiv = (s, col = 'transparent') => {
     let div = document.createElement('div');
@@ -161,7 +183,7 @@ const fetchSchema = fetchTries => {
         if (schema) res(schema);
         else
             res(
-                fetch(url + php + 'schema.json')
+                fetch(url + php + 'schema.json' ,{ cache: noCache ? 'reload' : 'default' })
                     .then(r => r.json())
                     .then(r => {
                         schema = r;
@@ -240,12 +262,13 @@ const fetchSchema = fetchTries => {
 };
 
 const fetchLastUpdate = () => {
-    return fetch(url + php + 'lastUpdate.json')
+    return fetch(url + php + 'lastUpdate.json', { cache: noCache ? 'reload' : 'default' })
         .then(r => r.json())
         .then(r => {
             //console.log(r);
             refs.lastUpdate.innerHTML = r.lastUpdate;
             refs.available.innerHTML = r.airspaces;
+            return r;
         });
 };
 
@@ -254,7 +277,7 @@ const fetchCountryList = fetchTries => {
         if (countries) res(countries);
         else
             res(
-                fetch(url + php + 'countries.json')
+                fetch(url + php + 'countries.json' ,{ cache: noCache ? 'reload' : 'default' })
                     .then(r => r.json())
                     .then(r => {
                         r.sort((a, b) => (a.name > b.name ? 1 : -1));
@@ -341,47 +364,6 @@ const fetchCountryList = fetchTries => {
 
 ////drag
 
-function addDrag() {
-    refs.aipInfo.style.top = 'calc(100% - 120px)';
-    refs.aipDiv.style.bottom = '120px';
-    refs.dragHandle.style.top = 'calc(100% - 120px)';
-    let el = refs.dragHandle;
-    let top, topOffs;
-    let mouseDown = false;
-    const handleStart = e => {
-        e.preventDefault();
-        e.stopPropagation();
-        top = el.offsetTop;
-        let pos = e.targetTouches ? e.targetTouches[0] : e;
-        topOffs = top - pos.pageY;
-        mouseDown = true;
-    };
-    const handleEnd = e => {
-        mouseDown = false;
-        document.removeEventListener('mouseup', handleEnd);
-        document.removeEventListener('mousemove', handleMove);
-    };
-    const handleCancel = e => {
-        console.log('cancel', e);
-    };
-    const handleMove = e => {
-        if (!mouseDown) return;
-        let pos = e.targetTouches ? e.targetTouches[0] : e;
-        el.style.top = topOffs + pos.clientY + 20 + 'px';
-        refs.aipInfo.style.top = topOffs + pos.clientY + 20 + 'px';
-        refs.aipDiv.style.bottom = 'calc(100% - ' + (topOffs + pos.clientY + 20) + 'px)';
-    };
-    el.addEventListener('touchstart', handleStart);
-    el.addEventListener('touchend', handleEnd);
-    el.addEventListener('touchcancel', handleCancel);
-    el.addEventListener('touchmove', handleMove);
-    el.addEventListener('mousedown', e => {
-        handleStart(e);
-        document.addEventListener('mouseup', handleEnd);
-        document.addEventListener('mousemove', handleMove);
-    });
-}
-//addDrag();
 /////
 
 /////  map interaction,   either  leaflet or mapLibre
@@ -624,7 +606,7 @@ const fetchAsp = function (i, fitbnds, cbf) {
     if (!countries[i].fetched) {
         countries[i].fetched = true;
         //http.get(`${url+php}${countries[i].name}.geojson`).then(d => d.data).then(r => {
-        return fetch(`${url + php}${countries[i].name}.geojson`)
+        return fetch(`${url + php}${countries[i].name}.geojson` ,{ cache: noCache ? 'reload' : 'default' })
             .then(r => r.json())
             .then(r => {
                 countries[i].asp = r; //JSON.parse(r);
@@ -720,12 +702,23 @@ const aspColor = function (p) {
     }
 };
 
+
 function fetchSchemaAndCountries() {
-    Promise.all([fetchLastUpdate(0), fetchSchema(0), fetchCountryList(0)]).then(() => {
-        //may already be loaded countries
-        filterTypeIcao();
-    });
-    addDrag();
+    return fetchLastUpdate(0).then(upd => {
+        if ((Date.now() - new Date(upd.lastUpdate).getTime()) > 24 * 60 * 60000) {
+            console.log(upd.lastUpdate, Date.now() - new Date(upd.lastUpdate).getTime());
+            noCache = true;
+            console.log("do not use cached data");
+            return fetchLastUpdate(0);
+        } else {
+            console.log("using cached data");
+        }
+    }).then(() =>
+        Promise.all([fetchSchema(0), fetchCountryList(0)]).then(() => {
+            //may already be loaded countries
+            filterTypeIcao();
+        })
+    );
 }
 
 
@@ -769,9 +762,9 @@ function makeText4Picker(aspAr) {
                         ${p.name} &nbsp;&nbsp;&nbsp; 
                     </div>
                     <div style='display:none'>
-                        <span style='font-size:9px;'>&nbsp;&nbsp;Cat:&nbsp;${schema.icao[p.icao]}</span><br>
-                        <span style='font-size:9px;'>&nbsp;&nbsp;Type:&nbsp;${schema.type[p.type]}</span><br>
-                        <span style='font-size:9px;'>&nbsp;&nbsp;${p.ll.value}${altUnit(p.ll.unit)} ${schema.altRef[p.ll.referenceDatum]}-${p.ul.value}${altUnit(p.ul.unit)} ${schema.altRef[p.ul.referenceDatum]}</span>
+                        <span style='font-size:0.8em'>&nbsp;&nbsp;Cat:&nbsp;${schema.icao[p.icao]}</span><br>
+                        <span style='font-size:0.8em'>&nbsp;&nbsp;Type:&nbsp;${schema.type[p.type]}</span><br>
+                        <span style='font-size:0.8em'>&nbsp;&nbsp;${p.ll.value}${altUnit(p.ll.unit)} ${schema.altRef[p.ll.referenceDatum]}-${p.ul.value}${altUnit(p.ul.unit)} ${schema.altRef[p.ul.referenceDatum]}</span>
                     </div>`;
     });
     return txt;
@@ -779,7 +772,7 @@ function makeText4Picker(aspAr) {
 function makeText4Info(aspAr) {
     let txt = '';
     aspAr.forEach(p => {
-        txt += `<div><b>${p.name}</b></div>
+        txt += `<div style = 'color:${aspColor(p)};'><b>${p.name}</b></div>
                     <div>
                         <span style='font-size:10px;'>&nbsp;&nbsp;&nbsp;&nbsp;Cat:&nbsp;${schema.icao[p.icao]}</span>
                         <span style='font-size:10px;'>&nbsp;&nbsp;&nbsp;&nbsp;Type:&nbsp;${schema.type[p.type]}</span><br>

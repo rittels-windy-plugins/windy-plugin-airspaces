@@ -21,16 +21,19 @@ function loadPlugins() {
             'https://www.flymap.org.za/windy_plugins/pickertools/plugin.min.js?' + Date.now(),
             'windy-plugin-picker-tools',
         ),
+/*
         loadReqPlugin(
             'https://www.flymap.org.za/windy_plugins/embedbox/plugin.min.js?' + Date.now(),
             'windy-plugin-embedbox',
         ),
+  */  
     ];
 
-    return Promise.all(moduleLoadPromises).then(([pickerT, embedbox]) =>
+    return Promise.all(moduleLoadPromises).then(([pickerT, embedbox]) =>{
         // pickerT only has to be active,  but embedbox must be open,  it may have been closed by another plugin
-        plugins['windy-plugin-embedbox'].open().then(() => ({ pickerT, embedbox }))
-    )
+        //plugins['windy-plugin-embedbox'].open().then(() => ({ pickerT, embedbox }))
+        return {pickerT, embedbox}
+})
 }
 
 export { loadPlugins }

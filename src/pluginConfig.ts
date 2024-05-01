@@ -8,9 +8,11 @@ const config: ExternalPluginConfig = {
     description:'Shows airspaces from openaip.net',
     author: 'Rittels',
     repository: 'github.com/rittels-windy-plugins/windy-plugin-airspaces.git',
-    desktopUI: 'rhpane',
+    desktopUI: 'embedded',
     mobileUI: 'fullscreen',
+    listenToSingleclick: true,
     //routerPath: '/my-plugin',
+
 };
 
 export default config;

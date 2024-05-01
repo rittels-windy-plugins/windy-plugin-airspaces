@@ -7,7 +7,7 @@
         "removeComments": true,
         "outDir": "dist",
         "target": "es2022",
-        "typeRoots": [ "./node_modules/@types/","./declarations"],
+        "typeRoots": [ "../node_modules/@types/","./declarations"],
         "resolveJsonModule": false,
         "sourceMap": false,
         "incremental": true,
@@ -25,10 +25,10 @@
         "isolatedModules": true,
         "paths": {
             "@windy/*": [
-                "./node_modules/@windycom/plugin-devtools/types/*",
-                "./node_modules/@windycom/plugin-devtools/types/client/*",
+                "../node_modules/@windycom/plugin-devtools/types/*",
+                "../node_modules/@windycom/plugin-devtools/types/client/*",
             ],
         }
     },
-    "include": ["**/*.ts", "**/*.svelte"],
+    "include": ["**/*.ts", "**/*.svelte", "src/airspaces_main.js"],
 }
