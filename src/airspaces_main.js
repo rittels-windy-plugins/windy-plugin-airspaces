@@ -66,7 +66,6 @@ function closeCompletely() {
     pickerT.offClose(clearAsp);
     pickerT.offDrag(pickerOpenOrMoved);
     pickerT.remRightPlugin(name);
-    // pickerT.removeMarker();  // not needed
 
     singleclick.release(name, 'high');
     singleclick.singleclick.off(name, pickerT.openMarker);
@@ -81,6 +80,12 @@ function closeCompletely() {
     countries = null; //needed?
 
     bcast.fire('rqstClose', name);
+
+    // other plugins will try to defocus this plugin.
+    delete thisPlugin.focus;
+    delete thisPlugin.defocus;
+
+    pickerT = null;  // in case plugin re-opened
     hasHooks = false;
 }
 
@@ -104,10 +109,10 @@ function onPluginClosed(p) {
 }
 
 function pickerOpenOrMoved(c) {
-    console.log('picker open or moved in airspases', c);
+    //console.log('picker open or moved in airspases', c);
     if (!c) return;
     if (pickerT.getRightPlugin() != name) {
-        console.log('Airspaces cannot use right div because', pickerT.getRightPlugin(), 'is using it');
+        //console.log('Airspaces cannot use right div because', pickerT.getRightPlugin(), 'is using it');
         return;
     }
 
@@ -692,7 +697,6 @@ let exports = {
     //plugins_openAIPasp,
     fetchAsp,
     findAsp,
-    clearAsp,
     removeAllAsp,
     load,
     setOpac,

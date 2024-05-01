@@ -3,7 +3,7 @@
         class="checkbox"
         class:checkbox--off={!thisPlugin.isFocused}
         style="position:relative; top:0.1em"
-        data-tooltip={`Click checkbox focus on the ${title} plugin.`}
+        data-tooltip={`Picker focuses on the ${title} plugin.`}
         on:click={focus}>&nbsp;</span
     >
     <span
@@ -143,5 +143,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1714597959229';
+    @import 'airspaces.less?1714603992499';
 </style>
