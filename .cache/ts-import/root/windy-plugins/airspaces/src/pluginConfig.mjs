@@ -1,13 +1,13 @@
 const config = {
     name: 'windy-plugin-airspaces',
-    version: '0.2.0',
+    version: '0.2.2',
     icon: '✈',
     title: 'Airspaces',
     description: 'Shows airspaces from openaip.net',
     author: 'Rittels',
     repository: 'github.com/rittels-windy-plugins/windy-plugin-airspaces.git',
     desktopUI: 'embedded',
-    mobileUI: 'fullscreen',
+    mobileUI: 'small',
     listenToSingleclick: true,
     //routerPath: '/my-plugin',
 };
