@@ -16,9 +16,6 @@
 </div>
 
 <div bind:this={mainDiv} id={`${name}-info`} data-ref="mainDiv" class="bg-transparent dark-content">
-    <div class="aipHead plugin__title">
-        <a href="http://www.openaip.net" target="_blank"><u>openAIP</u></a> airspaces:
-    </div>
     <div
         class="closing-x"
         on:click={() => {
@@ -26,30 +23,36 @@
         }}
     ></div>
     <div bind:this={cornerHandle} data-ref="cornerHandle" class="corner-handle"></div>
+    <div bind:this={cornerHandleTop} data-ref="cornerHandleTop" class="corner-handle-top"></div>
 
-    <div bind:this={aipDiv} data-ref="aipDiv" class="scrollable">
-        <input type="checkbox" class="section-checkbox" />
-        <label class="section-head">Country List</label>
-        <div class="space-div"></div>
-        <div data-ref="airspaceList" class=" airspace-list"></div>
+    <div class="overflow-hidden">
+        <div class="aipHead plugin__title">
+            <a href="http://www.openaip.net" target="_blank"><u>openAIP</u></a> airspaces:
+        </div>
+        <div bind:this={aipDiv} data-ref="aipDiv" class="scrollable">
+            <input type="checkbox" class="section-checkbox" />
+            <label class="section-head">Country List</label>
+            <div class="space-div"></div>
+            <div data-ref="airspaceList" class=" airspace-list"></div>
 
-        <input type="checkbox" class="section-checkbox" />
-        <label class="section-head">Select Type</label>
-        <div class="space-div"></div>
-        <div data-ref="typeList" class="type-list"></div>
+            <input type="checkbox" class="section-checkbox" />
+            <label class="section-head">Select Type</label>
+            <div class="space-div"></div>
+            <div data-ref="typeList" class="type-list"></div>
 
-        <input type="checkbox" class="section-checkbox" />
-        <label class="section-head">Select Icao Class</label>
-        <div class="space-div"></div>
-        <div data-ref="icaoList" class="icao-list"></div>
+            <input type="checkbox" class="section-checkbox" />
+            <label class="section-head">Select Icao Class</label>
+            <div class="space-div"></div>
+            <div data-ref="icaoList" class="icao-list"></div>
+        </div>
+        <div bind:this={aipInfo} data-ref="aipInfo" class="plugin-content aipInfo"></div>
+        <div class="aipFoot">
+            Airspaces data from <a style="text-decoration:underline" href="http://www.openaip.net" target="_blank">openAIP</a>.<br />
+            Available airspaces: <span data-ref="available"></span>. Updated:
+            <span data-ref="lastUpdate"></span>.
+        </div>
+        <div bind:this={dragHandle} data-ref="dragHandle" class="drag-handle"></div>
     </div>
-    <div bind:this={aipInfo} data-ref="aipInfo" class="plugin-content aipInfo"></div>
-    <div class="aipFoot">
-        Airspaces data from <a style="text-decoration:underline" href="http://www.openaip.net" target="_blank">openAIP</a>.<br />
-        Available airspaces: <span data-ref="available"></span>. Updated:
-        <span data-ref="lastUpdate"></span>.
-    </div>
-    <div bind:this={dragHandle} data-ref="dragHandle" class="drag-handle"></div>
 </div>
 
 <script>
@@ -59,7 +62,7 @@
     import plugins from '@windy/plugins';
 
     import { init, closeCompletely, exports } from './airspaces_main.js';
-    import { addDrag, showInfo, getWrapDiv } from './infoWinUtils.js';
+    import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle } from './infoWinUtils.js';
     import { getPickerMarker } from './picker.js';
 
     import config from './pluginConfig';
@@ -69,10 +72,10 @@
     const thisPlugin = plugins[name];
     let node;
     let mainDiv;
-    let cornerHandle;
+    let cornerHandle, cornerHandleTop;
     let closeButtonClicked = false;
-    
-    let dragHandle,  aipInfo, aipDiv;
+
+    let dragHandle, aipInfo, aipDiv;
 
     function focus() {
         for (let p in plugins) {
@@ -106,10 +109,8 @@
         const wrapDiv = getWrapDiv();
         wrapDiv.appendChild(mainDiv);
 
-        addDrag(cornerHandle, (x, y) => {
-            mainDiv.style.height = y + 'px';
-            mainDiv.style.width = x + 'px';
-        });
+        makeBottomRightHandle(cornerHandle, mainDiv);
+        makeTopLeftHandle(cornerHandleTop, mainDiv);
 
         //// this should not be needed later
         node.querySelector(':scope > .closing-x').addEventListener('click', () => (closeButtonClicked = true));
@@ -126,6 +127,7 @@
             console.log(x, y);
             aipInfo.style.top = y + 'px';
             aipDiv.style.bottom = 'calc(100% - ' + y + 'px)';
+            dragHandle.style.top = y + 'px';
         });
     });
 
@@ -139,9 +141,19 @@
         ////
     });
 
-    export const onopen = _params => {};
+    export const onopen = _params => {
+        let list = _params?.list?.split(',').map(c => c.trim());
+        if (list && list.length) {
+            exports.fetchCountryList().then(cs =>
+                list.forEach(a => {
+                    let i = cs.findIndex(c => c.name.slice(-2) == a);
+                    if (i >= 0) exports.fetchAsp(i, list.length == 1 ? true : false);
+                }),
+            );
+        }
+    };
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1714637940562';
+    @import 'airspaces.less?1715148722160';
 </style>

@@ -93,7 +93,7 @@ function closeCompletely() {
 function onPluginOpened(p) {
     // other plugins do not get priority back,  when reopened,  like better sounding.
     if (W.plugins[p].listenToSingleclick && W.plugins[p].singleclickPriority == 'high') {
-        console.log('single click to', p);
+        //console.log('single click to', p);
         singleclick.register(p, 'high');
     }
 
@@ -104,7 +104,7 @@ function onPluginOpened(p) {
 function onPluginClosed(p) {
     // if the plugin closed has high singleclickpriority,  it returns single click to default picker,
     // so instead register this plugin as priority high
-    console.log('on plugin closed', p, 'this plugin gets priority', name);
+    //console.log('on plugin closed', p, 'this plugin gets priority', name);
     if (p !== name && W.plugins[p].singleclickPriority == 'high') singleclick.register(name, 'high');
 }
 
@@ -166,7 +166,7 @@ const fetchSchema = fetchTries => {
                     }),
             );
     }).then(() => {
-        console.log('schema', schema);
+        //console.log('schema', schema);
         for (let k in schema) {
             schemaSel[k] = [];
         }
@@ -246,7 +246,7 @@ const fetchLastUpdate = () => {
         });
 };
 
-const fetchCountryList = fetchTries => {
+const fetchCountryList = (fetchTries=0) => {
     return new Promise((res, rej) => {
         if (countries) res(countries);
         else
@@ -256,13 +256,25 @@ const fetchCountryList = fetchTries => {
                     .then(r => {
                         r.sort((a, b) => (a.name > b.name ? 1 : -1));
                         countries = r;
+                        //console.log("COUNTRIES", countries);
                         //Object.assign(thisPlugin.vars, { countries });
-                        return;
+                        return countries;
                     }),
             );
+    }). catch(error => {
+        console.error('Error:', error, 'Attempt', fetchTries);
+        if (fetchTries < 3) {
+            setTimeout(fetchCountryList, 2000, fetchTries + 1);
+        } else if (fetchTries < 6) {
+            url = url2;
+            setTimeout(fetchCountryList, 2000, fetchTries + 1);
+        } else refs.aipDiv.innerHTML = 'Failed to load country list.<br>You can try to reload plugin.';
     })
-        .then(() => {
-            console.log('countries fetched', countries);
+}
+
+const makeCountryList=(countries)=>{
+        
+            //console.log('countries fetched', countries);
             countries.forEach((e, i) => {
                 let countryCode = e.name.slice(-2);
                 let s = e.name.slice(0, -3);
@@ -312,16 +324,8 @@ const fetchCountryList = fetchTries => {
                 });
                 if (position) findAsp(position);
             });
-        })
-        .catch(error => {
-            console.error('Error:', error, 'Attempt', fetchTries);
-            if (fetchTries < 3) {
-                setTimeout(fetchCountryList, 2000, fetchTries + 1);
-            } else if (fetchTries < 6) {
-                url = url2;
-                setTimeout(fetchCountryList, 2000, fetchTries + 1);
-            } else refs.aipDiv.innerHTML = 'Failed to load country list.<br>You can try to reload plugin.';
-        });
+        
+       
 };
 
 /////  map interaction  LEAFLET
@@ -518,7 +522,7 @@ function fetchSchemaAndCountries() {
     return fetchLastUpdate(0)
         .then(upd => {
             if (Date.now() - new Date(upd.lastUpdate).getTime() > 24 * 60 * 60000) {
-                console.log(upd.lastUpdate, Date.now() - new Date(upd.lastUpdate).getTime());
+                //console.log(upd.lastUpdate, Date.now() - new Date(upd.lastUpdate).getTime());
                 noCache = true;
                 console.log('do not use cached data');
                 return fetchLastUpdate(0);
@@ -527,7 +531,8 @@ function fetchSchemaAndCountries() {
             }
         })
         .then(() =>
-            Promise.all([fetchSchema(0), fetchCountryList(0)]).then(() => {
+            Promise.all([fetchSchema(0), fetchCountryList()]).then(r => {
+                makeCountryList(r[1]);
                 //may already be loaded countries
                 filterTypeIcao();
             }),
@@ -683,13 +688,14 @@ function setOpac(op) {
 }
 
 function getCountries() {
-    return countryFetchPromise.then(() => countries);
+    return fetchCountryList();
 }
 
 let exports = {
     findAsp,
     clearAsp,
-    getCountries,
+    //getCountries,
+    fetchCountryList,
     //appendAspListToDiv,
     //reference2map,
     prevLayerAr,
