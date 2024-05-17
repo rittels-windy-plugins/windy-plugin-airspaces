@@ -62,7 +62,7 @@
     import plugins from '@windy/plugins';
 
     import { init, closeCompletely, exports } from './airspaces_main.js';
-    import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle } from './infoWinUtils.js';
+    import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle, embedForTablet } from './infoWinUtils.js';
     import { getPickerMarker } from './picker.js';
 
     import config from './pluginConfig';
@@ -111,6 +111,7 @@
 
         makeBottomRightHandle(cornerHandle, mainDiv);
         makeTopLeftHandle(cornerHandleTop, mainDiv);
+        embedForTablet(thisPlugin);
 
         //// this should not be needed later
         node.querySelector(':scope > .closing-x').addEventListener('click', () => (closeButtonClicked = true));
@@ -124,7 +125,6 @@
         aipDiv.style.bottom = '120px';
         dragHandle.style.top = 'calc(100% - 120px)';
         addDrag(dragHandle, (x, y) => {
-            console.log(x, y);
             aipInfo.style.top = y + 'px';
             aipDiv.style.bottom = 'calc(100% - ' + y + 'px)';
             dragHandle.style.top = y + 'px';
@@ -155,5 +155,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1715148722160';
+    @import 'airspaces.less?1715952747220';
 </style>
