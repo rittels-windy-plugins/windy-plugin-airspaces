@@ -2,6 +2,9 @@ import plugins from '@windy/plugins';
 import { $, getRefs } from '@windy/utils';
 import { map } from '@windy/map';
 import bcast from '@windy/broadcast';
+import loc from '@windy/location';
+import store from '@windy/store';
+import http from '@windy/http';
 
 import * as singleclick from '@windy/singleclick';
 
@@ -27,6 +30,14 @@ let countries,
     schema,
     schemaSel = [];
 
+
+let loggerTO;
+function logMessage(msg) {
+    if (!store.get('consent').analytics) return;
+    fetch(`https://www.flymap.org.za/windy-logger/logger.htm?name=${name}&message=${msg}`, { cache: 'no-store' })
+        .then(console.log);
+}
+
 function init(plgn) {
     //grab node and refs
 
@@ -44,6 +55,12 @@ function init(plgn) {
 
     if (hasHooks) return;
 
+    // log message
+    let devMode = loc.getURL().includes('windy.com/dev');
+    logMessage(devMode ? 'open_dev' : 'open_user');
+    if (!devMode) loggerTO = setTimeout(logMessage, 1000 * 60 * 3, '3min');
+    //
+
     singleclick.singleclick.on(name, pickerT.openMarker);
     bcast.on('pluginOpened', onPluginOpened);
     bcast.on('pluginClosed', onPluginClosed);
@@ -54,11 +71,16 @@ function init(plgn) {
     pickerT.onOpen(pickerOpenOrMoved);
     pickerT.onClose(clearAsp);
 
+    checkVersion();
+
+    hasHooks=true;
     thisPlugin.closeCompletely = closeCompletely;
 }
 
 function closeCompletely() {
     console.log('Airspaces closing completely');
+
+    clearTimeout(loggerTO);
 
     removeGlobalCss();
 
@@ -118,6 +140,28 @@ function pickerOpenOrMoved(c) {
 
     pickerT.fillRightDiv(findAsp(c).txt);
 }
+
+
+/////////////////////
+//--message Div and Check Version
+/////////////////////
+
+function showMsg(m, timeout = 30 * 1000) {
+    refs.messageDiv.innerHTML = m;
+    refs.messageDiv.classList.remove('hidden');
+    if (timeout) setTimeout(() => refs.messageDiv.classList.add('hidden'), timeout);
+    //else do not remove the message 
+}
+
+function checkVersion() {
+    http.get('/articles/plugins/list').then(({ data }) => {
+        let newVersion = data.find(e => e.name == config.name).version;
+        if (newVersion !== config.version) {
+            showMsg(`Please Update to version: <b>${newVersion}</b><br>Uninstall the current version (${config.version}) first and then install version ${newVersion} from the Plugin Gallery.`, 60000)
+        }
+    })
+}
+
 
 ////can be cut from here if not windy module
 
@@ -246,7 +290,7 @@ const fetchLastUpdate = () => {
         });
 };
 
-const fetchCountryList = (fetchTries=0) => {
+const fetchCountryList = (fetchTries = 0) => {
     return new Promise((res, rej) => {
         if (countries) res(countries);
         else
@@ -261,7 +305,7 @@ const fetchCountryList = (fetchTries=0) => {
                         return countries;
                     }),
             );
-    }). catch(error => {
+    }).catch(error => {
         console.error('Error:', error, 'Attempt', fetchTries);
         if (fetchTries < 3) {
             setTimeout(fetchCountryList, 2000, fetchTries + 1);
@@ -272,60 +316,60 @@ const fetchCountryList = (fetchTries=0) => {
     })
 }
 
-const makeCountryList=(countries)=>{
-        
-            //console.log('countries fetched', countries);
-            countries.forEach((e, i) => {
-                let countryCode = e.name.slice(-2);
-                let s = e.name.slice(0, -3);
-                s = s[0].toUpperCase() + s.slice(1);
-                for (let j = 0, l = s.length; j < l; j++) if (s[j] == '_') s = s.slice(0, j) + ' ' + s[j + 1].toUpperCase() + s.slice(j + 2);
-                s += ' (' + countryCode + ')';
-                let cntdiv = createListDiv(s);
-                e.cntdiv = cntdiv;
-                cntdiv.addEventListener('click', () => {
-                    if (!(countries[i].gjLayer || countries[i].mlLayer)) {
-                        cntdiv.classList.add('highlight', 'loading-asp');
-                        fetchAsp(i, true).then(() => setTimeout(() => cntdiv.classList.remove('loading-asp'), 100));
-                    } else {
-                        ////
-                        removeLayer(i);
-                        ///
-                        cntdiv.classList.remove('highlight');
-                    }
-                    if (position) findAsp(position);
-                });
-                if (e.fetched) cntdiv.classList.add('highlight');
-                refs.airspaceList.appendChild(cntdiv);
-            });
-            let addAll = createListDiv('Select All');
-            refs.airspaceList.appendChild(addAll);
-            addAll.addEventListener('click', () => {
-                countries.forEach((c, i) => {
-                    if (!(c.gjLayer || c.mlLayer)) {
-                        c.cntdiv.classList.add('highlight', 'loading-asp');
-                        fetchAsp(i).then(() => c.cntdiv.classList.remove('loading-asp'));
-                    }
-                });
-                if (position) findAsp(position);
-            });
-            let remAll = createListDiv('Deselect All');
-            refs.airspaceList.appendChild(remAll);
-            remAll.addEventListener('click', () => {
-                countries.forEach((c, i) => {
-                    if (countries[i].gjLayer || countries[i].mlLayer) {
-                        ////
+const makeCountryList = (countries) => {
 
-                        removeLayer(i);
-                        ///
+    //console.log('countries fetched', countries);
+    countries.forEach((e, i) => {
+        let countryCode = e.name.slice(-2);
+        let s = e.name.slice(0, -3);
+        s = s[0].toUpperCase() + s.slice(1);
+        for (let j = 0, l = s.length; j < l; j++) if (s[j] == '_') s = s.slice(0, j) + ' ' + s[j + 1].toUpperCase() + s.slice(j + 2);
+        s += ' (' + countryCode + ')';
+        let cntdiv = createListDiv(s);
+        e.cntdiv = cntdiv;
+        cntdiv.addEventListener('click', () => {
+            if (!(countries[i].gjLayer || countries[i].mlLayer)) {
+                cntdiv.classList.add('highlight', 'loading-asp');
+                fetchAsp(i, true).then(() => setTimeout(() => cntdiv.classList.remove('loading-asp'), 100));
+            } else {
+                ////
+                removeLayer(i);
+                ///
+                cntdiv.classList.remove('highlight');
+            }
+            if (position) findAsp(position);
+        });
+        if (e.fetched) cntdiv.classList.add('highlight');
+        refs.airspaceList.appendChild(cntdiv);
+    });
+    let addAll = createListDiv('Select All');
+    refs.airspaceList.appendChild(addAll);
+    addAll.addEventListener('click', () => {
+        countries.forEach((c, i) => {
+            if (!(c.gjLayer || c.mlLayer)) {
+                c.cntdiv.classList.add('highlight', 'loading-asp');
+                fetchAsp(i).then(() => c.cntdiv.classList.remove('loading-asp'));
+            }
+        });
+        if (position) findAsp(position);
+    });
+    let remAll = createListDiv('Deselect All');
+    refs.airspaceList.appendChild(remAll);
+    remAll.addEventListener('click', () => {
+        countries.forEach((c, i) => {
+            if (countries[i].gjLayer || countries[i].mlLayer) {
+                ////
 
-                        c.cntdiv.classList.remove('highlight');
-                    }
-                });
-                if (position) findAsp(position);
-            });
-        
-       
+                removeLayer(i);
+                ///
+
+                c.cntdiv.classList.remove('highlight');
+            }
+        });
+        if (position) findAsp(position);
+    });
+
+
 };
 
 /////  map interaction  LEAFLET

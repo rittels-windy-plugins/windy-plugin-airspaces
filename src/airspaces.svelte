@@ -13,6 +13,8 @@
         }}
         style:cursor="pointer">Show Airspaces</span
     >
+    <div data-ref="messageDiv" class="hidden" style="font-size:0.8em"></div>
+
 </div>
 
 <div bind:this={mainDiv} id={`${name}-info`} data-ref="mainDiv" class="bg-transparent dark-content">
@@ -155,5 +157,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1715952747220';
+    @import 'airspaces.less?1731482631221';
 </style>
