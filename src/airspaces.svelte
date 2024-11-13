@@ -1,4 +1,4 @@
-<div>
+<div class="embed-window">
     <span
         class="checkbox"
         class:checkbox--off={!thisPlugin.isFocused}
@@ -157,5 +157,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1731482631221';
+    @import 'airspaces.less?1731483774553';
 </style>
