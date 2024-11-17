@@ -13,7 +13,11 @@ const { name } = config;
 
 import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
 
-import { getPickerMarker } from './picker.js';
+import { getPickerMarker } from './picker/picker.js';
+
+import {checkVersion, showMsg } from './utils/infoWinUtils.js';
+
+
 
 let thisPlugin;
 let refs, node;
@@ -71,7 +75,7 @@ function init(plgn) {
     pickerT.onOpen(pickerOpenOrMoved);
     pickerT.onClose(clearAsp);
 
-    checkVersion();
+    checkVersion(refs.messageDiv);
 
     hasHooks=true;
     thisPlugin.closeCompletely = closeCompletely;
@@ -141,26 +145,6 @@ function pickerOpenOrMoved(c) {
     pickerT.fillRightDiv(findAsp(c).txt);
 }
 
-
-/////////////////////
-//--message Div and Check Version
-/////////////////////
-
-function showMsg(m, timeout = 30 * 1000) {
-    refs.messageDiv.innerHTML = m;
-    refs.messageDiv.classList.remove('hidden');
-    if (timeout) setTimeout(() => refs.messageDiv.classList.add('hidden'), timeout);
-    //else do not remove the message 
-}
-
-function checkVersion() {
-    http.get('/articles/plugins/list').then(({ data }) => {
-        let newVersion = data.find(e => e.name == config.name).version;
-        if (newVersion !== config.version) {
-            showMsg(`Please Update to version: <b>${newVersion}</b><br>Uninstall the current version (${config.version}) first and then install version ${newVersion} from the Plugin Gallery.`, 60000)
-        }
-    })
-}
 
 
 ////can be cut from here if not windy module

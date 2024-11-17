@@ -14,7 +14,6 @@
         style:cursor="pointer">Show Airspaces</span
     >
     <div data-ref="messageDiv" class="hidden"></div>
-
 </div>
 
 <div bind:this={mainDiv} id={`${name}-info`} data-ref="mainDiv" class="bg-transparent dark-content">
@@ -64,8 +63,8 @@
     import plugins from '@windy/plugins';
 
     import { init, closeCompletely, exports } from './airspaces_main.js';
-    import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle, embedForTablet } from './infoWinUtils.js';
-    import { getPickerMarker } from './picker.js';
+    import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle, embedForTablet } from './utils/infoWinUtils.js';
+    import { getPickerMarker } from './picker/picker.js';
 
     import config from './pluginConfig';
 
@@ -137,7 +136,7 @@
         mainDiv.remove();
         document.body.classList.remove(`on${name}-info`);
 
-        //// Should not be neede later
+        //// this should not be needed later,   whole plugin can then be moved into svelte,  open() requires an object
         if (!closeButtonClicked) setTimeout(() => thisPlugin.open({}));
         else closeCompletely();
         ////
@@ -157,5 +156,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1731483774553';
+    @import 'airspaces.less?1731862568405';
 </style>

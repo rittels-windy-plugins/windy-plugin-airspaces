@@ -1,4 +1,4 @@
-@import 'infoWin_style_svelte.less';
+@import 'utils/infoWin_style_svelte.less';
 
 @name  : windy-plugin-airspaces;
 @width : 350px;
@@ -132,7 +132,12 @@
     }
 }
 
+
 .embed-window{
+    [data-ref="messageDiv"] {
+        margin-top: 3px;
+        font-size : 0.8em;
+    }
     .hidden{
         display:none
     }
