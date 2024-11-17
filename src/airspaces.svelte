@@ -13,7 +13,7 @@
         }}
         style:cursor="pointer">Show Airspaces</span
     >
-    <div data-ref="messageDiv" class="hidden" style="font-size:0.8em"></div>
+    <div data-ref="messageDiv" class="hidden"></div>
 
 </div>
 
@@ -138,7 +138,7 @@
         document.body.classList.remove(`on${name}-info`);
 
         //// Should not be neede later
-        if (!closeButtonClicked) setTimeout(() => thisPlugin.open());
+        if (!closeButtonClicked) setTimeout(() => thisPlugin.open({}));
         else closeCompletely();
         ////
     });
