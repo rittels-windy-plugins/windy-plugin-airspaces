@@ -46,12 +46,9 @@
             <div class="space-div"></div>
             <div data-ref="icaoList" class="icao-list"></div>
         </div>
-        <div bind:this={aipInfo} data-ref="aipInfo" class="plugin-content aipInfo"></div>
-        <div class="aipFoot">
-            Airspaces data from <a style="text-decoration:underline" href="http://www.openaip.net" target="_blank">openAIP</a>.<br />
-            Available airspaces: <span data-ref="available"></span>. Updated:
-            <span data-ref="lastUpdate"></span>.
-        </div>
+        <div bind:this={aipInfo} data-ref="aipInfo" class:footerClosed class="plugin-content aipInfo"></div>
+
+        <Footer topRow={topRowHTML} onFooterClick={open => (footerClosed = !open)} />
         <div bind:this={dragHandle} data-ref="dragHandle" class="drag-handle"></div>
     </div>
 </div>
@@ -59,22 +56,28 @@
 <script>
     import { onDestroy, onMount } from 'svelte';
 
+    import Footer from './utils/Footer.svelte';
+
     import bcast from '@windy/broadcast';
     import plugins from '@windy/plugins';
 
     import { init, closeCompletely, exports } from './airspaces_main.js';
     import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle, embedForTablet } from './utils/infoWinUtils.js';
-    import { getPickerMarker } from './picker/picker.js';
+    import { getPickerMarker } from 'custom-windy-picker';
 
     import config from './pluginConfig';
 
     const { title, name } = config;
 
     const thisPlugin = plugins[name];
+    let footerClosed = false;
     let node;
     let mainDiv;
     let cornerHandle, cornerHandleTop;
     let closeButtonClicked = false;
+    let topRowHTML = `Airspaces data from <a style="text-decoration:underline" href="http://www.openaip.net" target="_blank">openAIP</a>.<br />
+            Available airspaces: <span data-ref="available"></span>. Updated:
+            <span data-ref="lastUpdate"></span>`;
 
     let dragHandle, aipInfo, aipDiv;
 
@@ -156,5 +159,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1731862568405';
+    @import 'airspaces.less?1749845881908';
 </style>

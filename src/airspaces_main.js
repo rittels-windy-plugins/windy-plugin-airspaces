@@ -1,23 +1,18 @@
-import plugins from '@windy/plugins';
 import { $, getRefs } from '@windy/utils';
 import { map } from '@windy/map';
 import bcast from '@windy/broadcast';
 import loc from '@windy/location';
 import store from '@windy/store';
-import http from '@windy/http';
 
 import * as singleclick from '@windy/singleclick';
 
 import config from './pluginConfig.js';
 const { name } = config;
+const {log}=console;
 
 import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
 
-import { getPickerMarker } from './picker/picker.js';
-
-import {checkVersion, showMsg } from './utils/infoWinUtils.js';
-
-
+import { getPickerMarker } from 'custom-windy-picker';
 
 let thisPlugin;
 let refs, node;
@@ -37,7 +32,7 @@ let countries,
 
 let loggerTO;
 function logMessage(msg) {
-    if (!store.get('consent').analytics) return;
+    if (!store.get('consent') || !store.get('consent').analytics) return;
     fetch(`https://www.flymap.org.za/windy-logger/logger.htm?name=${name}&message=${msg}`, { cache: 'no-store' })
         .then(console.log);
 }
@@ -75,9 +70,7 @@ function init(plgn) {
     pickerT.onOpen(pickerOpenOrMoved);
     pickerT.onClose(clearAsp);
 
-    checkVersion(refs.messageDiv);
-
-    hasHooks=true;
+    hasHooks = true;
     thisPlugin.closeCompletely = closeCompletely;
 }
 
@@ -137,6 +130,7 @@ function onPluginClosed(p) {
 function pickerOpenOrMoved(c) {
     //console.log('picker open or moved in airspases', c);
     if (!c) return;
+    // IMportant, dont fill div in not focussed
     if (pickerT.getRightPlugin() != name) {
         //console.log('Airspaces cannot use right div because', pickerT.getRightPlugin(), 'is using it');
         return;
@@ -267,7 +261,7 @@ const fetchLastUpdate = () => {
     return fetch(url + php + 'lastUpdate.json', { cache: noCache ? 'reload' : 'default' })
         .then(r => r.json())
         .then(r => {
-            //console.log(r);
+            console.log("REFS",refs.lastUpdate);
             refs.lastUpdate.innerHTML = r.lastUpdate;
             refs.available.innerHTML = r.airspaces;
             return r;

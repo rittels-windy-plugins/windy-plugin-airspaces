@@ -5,6 +5,8 @@ import { $ } from '@windy/utils';
 import http from '@windy/http';
 import config from '../pluginConfig.js';
 
+const { log } = console;
+
 
 /** 
  * @params el: sensitive element
@@ -60,6 +62,9 @@ function addDrag(el, onDrag, onDragEnd = () => { }) {
     });
 }
 
+/** shows the main box
+ * @param {i} name:  is windy-plugin-xxx 
+ */
 function showInfo(name) {
 
     let bdy = document.body;
@@ -118,8 +123,11 @@ function makeBottomRightHandle(el, div, callback) {
         div.style.left = l + 'px';
         div.style.top = t + 'px';
 
+        div.classList.remove("narrow", "medium", "wide");
+        div.classList.add(w < 200 ? "narrow" : w < 380 ? "medium" : "wide");
+
         bcast.fire("infoWinResized", { left: l, top: t, width: w, height: h, id, name });
-        if (callback) callback();  // propably better to use bcast
+        if (callback) callback({ left: l, top: t, width: w, height: h, id, name });  // propably better to use bcast
     });
 }
 
@@ -146,8 +154,11 @@ function makeTopLeftHandle(el, div, callback) {
         div.style.width = w + 'px';
         div.style.height = h + 'px';
 
+        div.classList.remove("narrow", "medium", "wide");
+        div.classList.add(w < 200 ? "narrow" : w < 380 ? "medium" : "wide");
+
         bcast.fire("infoWinResized", { left: l, top: t, width: w, height: h, id, name });
-        if (callback) callback();
+        if (callback) callback({ left: l, top: t, width: w, height: h, id, name });
     });
 }
 
@@ -181,7 +192,12 @@ function embedForTablet(thisPlugin) {
 // Other stuff used by all my plugins:
 
 // Show message:
-
+/**
+ * 
+ * @param {*} messageDiv - ref to the div
+ * @param {*} m - message
+ * @param {*} timeout - in millisecs 
+ */
 function showMsg(messageDiv, m, timeout = 30 * 1000) {
     messageDiv.innerHTML = m;
     messageDiv.classList.remove('hidden');
@@ -191,13 +207,66 @@ function showMsg(messageDiv, m, timeout = 30 * 1000) {
 
 // Check version
 
+/**
+ * This is no longer needed,   version update done by Windy
+ * @param {*} messageDiv - ref to the message div
+ */
 function checkVersion(messageDiv) {
     http.get('/articles/plugins/list').then(({ data }) => {
-        let newVersion = data.find(e => e.name == config.name).version;
+        let pluginInList = data.find(e => e.name == config.name);
+        if (!pluginInList) {
+            showMsg(messageDiv, config.name + " is not in the Gallery yet");
+            return
+        }
+        let newVersion = pluginInList.version;
         if (newVersion !== config.version) {
             showMsg(messageDiv, `Please Update to version: <b>${newVersion}</b><br>Uninstall the current version (${config.version}) first and then install version ${newVersion} from the Plugin Gallery.`, 60000)
         }
     })
 }
 
-export { addDrag, showInfo, getWrapDiv, makeTopLeftHandle, makeBottomRightHandle, embedForTablet, checkVersion, showMsg };
+function toggleFullscreen() {
+    let fs = document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement;
+    if (fs) closeFullscreen();
+    else openFullscreen();
+    return !fs;
+}
+
+function openFullscreen() {
+    const e = document.documentElement;
+    if (e.requestFullscreen) {
+        e.requestFullscreen();
+    } else if (e.webkitRequestFullscreen) { /* Safari */
+        e.webkitRequestFullscreen();
+    } else if (e.msRequestFullscreen) { /* IE11 */
+        e.msRequestFullscreen();
+    }
+}
+
+/* Close fullscreen */
+function closeFullscreen() {
+    if (document.exitFullscreen) {
+        document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) { /* Safari */
+        document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE11 */
+        document.msExitFullscreen();
+    }
+}
+
+export {
+    addDrag,
+    showInfo,
+    getWrapDiv,
+    makeTopLeftHandle,
+    makeBottomRightHandle,
+    embedForTablet,
+    checkVersion,
+    showMsg,
+    openFullscreen,
+    closeFullscreen,
+    toggleFullscreen
+};

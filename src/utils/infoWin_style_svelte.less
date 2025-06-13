@@ -1,11 +1,17 @@
+// Note for myself:  Hardlinks,  changing this affects the other plugins.  Use pluginname.less,  which will overwrite this.
+// infoWin_style_global.less is applied first then,  global.less,  then infoWin_style_svelte.less,  then pluginname.svelte
+// This is important to understand how it is overwritten. 
+
 // width and bottom can be overwritten in the importing file
 @bottom: 170px;
 @width : 400px;
 
 .add-scroll-bar {
+    overflow-y: scroll;
+
     &::-webkit-scrollbar {
-        width: 8px;
-        height:8px;
+        width : 8px;
+        height: 8px;
     }
 
     &::-webkit-scrollbar-thumb {
@@ -24,7 +30,7 @@
     bottom       : @bottom;
     left         : 8px;
     border-radius: 10px;
-    padding      : 2px 0px 5px 0px;
+    padding      : 5px 0px 4px 2px;
     width        : @width;
     max-height   : 100vh;
     line-height  : 1;
@@ -93,5 +99,26 @@
             background-color      : transparent;
             content               : ' ';
         }
+    }
+
+}
+
+.embed-window {
+    .checkbox {
+        position: relative;
+        top     : 0.1em;
+    }
+
+    .checkbox::before {
+        margin-right: 0px;
+    }
+
+    [data-ref="messageDiv"] {
+        margin-top: 3px;
+        font-size : 0.8em;
+    }
+
+    .hidden {
+        display: none
     }
 }
