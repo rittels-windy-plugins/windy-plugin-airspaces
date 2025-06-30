@@ -8,4 +8,6 @@ sudo ln -f ../infoWinUtils/README.md  ./src/utils/README.md
 sudo ln -f ../infoWinUtils/Footer.svelte  ./src/utils/Footer.svelte
 
 
+
+
 echo "done linking!"
