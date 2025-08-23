@@ -60,6 +60,7 @@
 
     import bcast from '@windy/broadcast';
     import plugins from '@windy/plugins';
+    import { isMobileOrTablet } from '@windy/rootScope';
 
     import { init, closeCompletely, exports } from './airspaces_main.js';
     import { addDrag, showInfo, getWrapDiv, makeBottomRightHandle, makeTopLeftHandle, embedForTablet } from './utils/infoWinUtils.js';
@@ -107,6 +108,7 @@
     onMount(() => {
         init(thisPlugin);
         node = thisPlugin.window.node;
+        if (isMobileOrTablet) node.style.pointerEvents = 'initial';
 
         // move to body immediately,  remove when plugin closed,  change display when .onwindy-plugin-airspaces-info is toggled on body
 
@@ -159,5 +161,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1755940143823';
+    @import 'airspaces.less?1755941870680';
 </style>

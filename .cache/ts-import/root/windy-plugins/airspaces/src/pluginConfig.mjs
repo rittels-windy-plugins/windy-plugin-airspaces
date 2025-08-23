@@ -1,6 +1,6 @@
 const config = {
     name: 'windy-plugin-airspaces',
-    version: '0.2.14',
+    version: '0.2.16',
     icon: '✈',
     title: 'Airspaces',
     description: 'Shows airspaces from openaip.net',
