@@ -11,7 +11,7 @@ You can filter the different types and icoa classes.
 
 Once the plugin has been installed,  open it with the following url:
 
-[windy.com/plugin/airspaces/list](https://www.windy.com/airspaces/be,fr,de)
+[windy.com/plugin/airspaces/list](https://www.windy.com/plugin/airspaces/be,fr,de)
 
 `list` is a  comma-separated list of country codes,  like `be,fr,de`.  
 
