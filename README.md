@@ -6,8 +6,14 @@ The airspace detail will be displayed in the custom picker,  and in the info win
 
 You can filter the different types and icoa classes.  
 
-If the plugin is installed,  it can be opened with the following link:  [www.windy.com/plugin/airspaces](https://www.windy.com/plugin/airspaces)
 
+### Path to this plugin:
+
+Once the plugin has been installed,  open it with the following url:
+
+[windy.com/plugin/airspaces/list](https://www.windy.com/airspaces/be,fr,de)
+
+`list` is a  comma-separated list of country codes,  like `be,fr,de`.  
 
 
 

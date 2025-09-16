@@ -1,50 +1,48 @@
 @import 'utils/infoWin_style_svelte.less';
 
-@name  : windy-plugin-airspaces;
-@width : 350px;
+@name: windy-plugin-airspaces;
+@width: 350px;
 @bottom: 150px;
 
-
 #@{name}-info {
-
     .overflow-hidden {
         position: absolute;
 
-        display:flex;
-        flex-direction : column;
+        display: flex;
+        flex-direction: column;
         justify-content: space-between;
-        height         : calc(100% - 5px);
+        height: calc(100% - 5px);
 
-        width: 100% ; 
+        width: 100%;
         overflow: hidden;
 
         .scrollable {
-            position     : absolute;
-            top          : 50px; // !important;
-            width        : 100%;
-            border-style : solid; // !important;
-            border-width : 0.75px 0px; // !important;
-            border-color : rgba(128, 128, 128, 0.5); // !important;
+            position: absolute;
+            top: 50px; // !important;
+            width: 100%;
+            border-style: solid; // !important;
+            border-width: 0.75px 0px; // !important;
+            border-color: rgba(128, 128, 128, 0.5); // !important;
             border-radius: 0px; // !important;
-            color        : inherit; // !important;
-            overflow-y   : scroll;
+            color: inherit; // !important;
+            overflow-y: scroll;
 
             .add-scroll-bar();
 
             .section-head {
-                position   : relative;
-                font-size  : 16px;
+                position: relative;
+                font-size: 16px;
                 line-height: 1.4em;
             }
 
             .section-checkbox {
-                font-size         : 16px;
+                font-size: 16px;
                 -webkit-appearance: none;
-                appearance        : none;
-                background-color  : transparent;
-                width             : 30px;
-                color             : inherit; // !important;
-                cursor            : pointer;
+                appearance: none;
+                background-color: transparent;
+                width: 30px;
+                color: inherit; // !important;
+                cursor: pointer;
             }
 
             .section-checkbox:focus {
@@ -57,18 +55,18 @@
 
             .section-checkbox:checked::before {
                 padding-top: 3px;
-                content    : '\25B7\00a0\00a0';
+                content: '\25B7\00a0\00a0';
             }
 
             .space-div {
                 height: 2px;
             }
 
-            .section-checkbox:checked+label+.space-div {
+            .section-checkbox:checked + label + .space-div {
                 height: 10px;
             }
 
-            .section-checkbox:checked+label+.space-div+div {
+            .section-checkbox:checked + label + .space-div + div {
                 display: none;
             }
 
@@ -82,27 +80,27 @@
         }
 
         .aipHead {
-            position     : sticky;
-            font-size    : 20px !important;
-            font-weight  : bold;
-            padding      : 0.5em;
+            position: sticky;
+            font-size: 20px !important;
+            font-weight: bold;
+            padding: 0.5em;
             //margin     : 1px 0px 0px 1px;
         }
 
         .aipInfo {
-            position    : absolute;
-            overflow-y  : scroll;
-            padding     : 5px;
-            font-size   : 11px;
-            bottom      : 44px;
-            width       : 100%;
+            position: absolute;
+            overflow-y: scroll;
+            padding: 5px;
+            font-size: 11px;
+            bottom: 44px;
+            width: 100%;
             border-style: solid; // !important;
             border-width: 1px 0px 0px 0px; // !important;
             border-color: rgba(128, 128, 128, 0.5); // !important;
-            color       : inherit;
+            color: inherit;
             .add-scroll-bar();
-            &.footerClosed{
-                bottom:0px;
+            &.footerClosed {
+                bottom: 0px;
             }
         }
 
@@ -118,37 +116,36 @@
             */
 
         .drag-handle {
-            box-sizing : border-box;
-            height     : 30px;
-            width      : 90px;
-            position   : absolute;
+            box-sizing: border-box;
+            height: 30px;
+            width: 90px;
+            position: absolute;
             margin-left: -45px;
-            margin-top : -15px;
-            left       : 50%;
-            cursor     : ns-resize;
+            margin-top: -15px;
+            left: 50%;
+            cursor: ns-resize;
 
             &::before {
-                content         : ' ';
-                box-sizing      : border-box;
-                position        : absolute;
-                left            : 30px;
-                top             : 11px;
-                width           : 30px;
-                height          : 8px;
-                border-radius   : 4px;
+                content: ' ';
+                box-sizing: border-box;
+                position: absolute;
+                left: 30px;
+                top: 11px;
+                width: 30px;
+                height: 8px;
+                border-radius: 4px;
                 background-color: rgba(230, 230, 230, 0.5);
             }
         }
     }
 }
 
-
-.embed-window{
-    [data-ref="messageDiv"] {
+.embed-window {
+    [data-ref='messageDiv'] {
         margin-top: 3px;
-        font-size : 0.8em;
+        font-size: 0.8em;
     }
-    .hidden{
-        display:none
+    .hidden {
+        display: none;
     }
 }

@@ -3,24 +3,19 @@ import { map } from '@windy/map';
 import bcast from '@windy/broadcast';
 import loc from '@windy/location';
 import store from '@windy/store';
-
 import * as singleclick from '@windy/singleclick';
 
 import config from './pluginConfig.js';
-const { name } = config;
-const {log}=console;
-
 import { insertGlobalCss, removeGlobalCss } from './globalCss.js';
-
 import { getPickerMarker } from 'custom-windy-picker';
+
+const { name } = config;
+const { log } = console;
 
 let thisPlugin;
 let refs, node;
-
 let hasHooks = false;
-
 let pickerT;
-
 let noCache = false;
 
 //const whichPicker = () => (rs.isMobileOrTablet ? 'picker-mobile' : 'picker');
@@ -29,12 +24,10 @@ let countries,
     schema,
     schemaSel = [];
 
-
 let loggerTO;
 function logMessage(msg) {
     if (!store.get('consent') || !store.get('consent').analytics) return;
-    fetch(`https://www.flymap.org.za/windy-logger/logger.htm?name=${name}&message=${msg}`, { cache: 'no-store' })
-        .then(console.log);
+    fetch(`https://www.flymap.org.za/windy-logger/logger.htm?name=${name}&message=${msg}`, { cache: 'no-store' }).then(console.log);
 }
 
 function init(plgn) {
@@ -104,7 +97,7 @@ function closeCompletely() {
     delete thisPlugin.focus;
     delete thisPlugin.defocus;
 
-    pickerT = null;  // in case plugin re-opened
+    pickerT = null; // in case plugin re-opened
     hasHooks = false;
 }
 
@@ -138,8 +131,6 @@ function pickerOpenOrMoved(c) {
 
     pickerT.fillRightDiv(findAsp(c).txt);
 }
-
-
 
 ////can be cut from here if not windy module
 
@@ -261,7 +252,7 @@ const fetchLastUpdate = () => {
     return fetch(url + php + 'lastUpdate.json', { cache: noCache ? 'reload' : 'default' })
         .then(r => r.json())
         .then(r => {
-            console.log("REFS",refs.lastUpdate);
+            console.log('REFS', refs.lastUpdate);
             refs.lastUpdate.innerHTML = r.lastUpdate;
             refs.available.innerHTML = r.airspaces;
             return r;
@@ -291,11 +282,10 @@ const fetchCountryList = (fetchTries = 0) => {
             url = url2;
             setTimeout(fetchCountryList, 2000, fetchTries + 1);
         } else refs.aipDiv.innerHTML = 'Failed to load country list.<br>You can try to reload plugin.';
-    })
-}
+    });
+};
 
-const makeCountryList = (countries) => {
-
+const makeCountryList = countries => {
     //console.log('countries fetched', countries);
     countries.forEach((e, i) => {
         let countryCode = e.name.slice(-2);
@@ -346,8 +336,6 @@ const makeCountryList = (countries) => {
         });
         if (position) findAsp(position);
     });
-
-
 };
 
 /////  map interaction  LEAFLET
@@ -391,11 +379,14 @@ function filterTypeIcao() {
 }
 
 function load(i) {
+    countries[i].cntdiv.classList.add('highlight'); // mostly redundant,  but needed if loaded from url
     loadGeoJson2Leaflet(i);
     filterTypeIcao();
+    setUrl();
 }
 
 function removeLayer(i) {
+    countries[i].cntdiv.classList.remove('highlight'); // mostly redundant
     map.removeLayer(countries[i].gjLayer);
     delete countries[i].gjLayer;
     filterTypeIcao();
@@ -436,6 +427,14 @@ function removeHighLight(f) {
 const getOpac = () => {
     return aspOpac;
 };
+
+function setUrl() {
+    let list = countries
+        .filter(c => c.gjLayer)
+        .map(c => c.name.slice(-2))
+        .join(',');
+    loc.setUrl(name, { list });
+}
 
 /**
  * fetch and load on available map
