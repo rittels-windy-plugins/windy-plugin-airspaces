@@ -1,9 +1,9 @@
 const config = {
     name: 'windy-plugin-airspaces',
-    version: '0.2.17',
+    version: '0.3.0',
     icon: '✈',
     title: 'Airspaces',
-    description: 'Shows airspaces from openaip.net',
+    description: 'Shows airspaces from openaip.net.  Open the plugin with "windy.com/plugin/airspaces',
     author: 'Rittels',
     repository: 'https://www.github.com/rittels-windy-plugins/windy-plugin-airspaces.git',
     desktopUI: 'embedded',

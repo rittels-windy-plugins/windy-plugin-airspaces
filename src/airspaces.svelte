@@ -107,7 +107,7 @@
 
     onMount(() => {
         init(thisPlugin);
-        node = thisPlugin.window.node;
+        node = document.getElementById('plugin-' + thisPlugin.ident);
         if (isMobileOrTablet) node.style.pointerEvents = 'initial';
 
         // move to body immediately,  remove when plugin closed,  change display when .onwindy-plugin-airspaces-info is toggled on body
@@ -161,5 +161,5 @@
 </script>
 
 <style lang="less">
-    @import 'airspaces.less?1758007058408';
+    @import 'airspaces.less?1770968807526';
 </style>

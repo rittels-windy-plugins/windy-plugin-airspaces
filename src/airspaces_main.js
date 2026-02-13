@@ -36,7 +36,7 @@ function init(plgn) {
     thisPlugin = plgn;
     thisPlugin.isActive = true;
 
-    ({ node } = thisPlugin.window);
+    node = document.getElementById('plugin-' + thisPlugin.ident);
     ({ refs } = getRefs(node));
 
     // important to close picker
@@ -387,7 +387,7 @@ function load(i) {
 
 function removeLayer(i) {
     countries[i].cntdiv.classList.remove('highlight'); // mostly redundant
-    map.removeLayer(countries[i].gjLayer);
+    if (countries[i].gjLayer && map.hasLayer(countries[i].gjLayer)) map.removeLayer(countries[i].gjLayer);
     delete countries[i].gjLayer;
     filterTypeIcao();
 }
@@ -684,7 +684,7 @@ function clearAsp() {
 function removeAllAsp() {
     countries.forEach(c => {
         if (c.gjLayer) {
-            map.removeLayer(c.gjLayer);
+            if (map.hasLayer(c.gjLayer)) map.removeLayer(c.gjLayer);
             delete c.gjLayer;
         }
         c.cntdiv.classList.remove('highlight');
