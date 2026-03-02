@@ -2,7 +2,7 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-airspaces',
-    version: '0.3.0',
+    version: '0.3.1',
     icon: '✈',
     title: 'Airspaces',
     description: 'Shows airspaces from openaip.net.  Open the plugin with "windy.com/plugin/airspaces',
